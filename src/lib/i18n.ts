@@ -33,7 +33,8 @@ export const translations = {
     alreadyHaveAccount: 'Heeft u al een account?',
     dontHaveAccount: 'Heeft u nog geen account?',
     signUpHere: 'Registreer hier',
-    signInHere: 'Log hier in'
+    signInHere: 'Log hier in',
+    languages: 'Talen'
   },
   en: {
     title: 'RechtAI',
@@ -65,7 +66,8 @@ export const translations = {
     alreadyHaveAccount: 'Already have an account?',
     dontHaveAccount: "Don't have an account?",
     signUpHere: 'Sign up here',
-    signInHere: 'Sign in here'
+    signInHere: 'Sign in here',
+    languages: 'Languages'
   },
   ar: {
     title: 'RechtAI',
@@ -97,7 +99,8 @@ export const translations = {
     alreadyHaveAccount: 'هل لديك حساب بالفعل؟',
     dontHaveAccount: 'ليس لديك حساب؟',
     signUpHere: 'سجل هنا',
-    signInHere: 'سجل الدخول هنا'
+    signInHere: 'سجل الدخول هنا',
+    languages: 'اللغات'
   },
   es: {
     title: 'RechtAI',
@@ -129,7 +132,8 @@ export const translations = {
     alreadyHaveAccount: '¿Ya tienes una cuenta?',
     dontHaveAccount: '¿No tienes una cuenta?',
     signUpHere: 'Regístrate aquí',
-    signInHere: 'Inicia sesión aquí'
+    signInHere: 'Inicia sesión aquí',
+    languages: 'Idiomas'
   },
   ru: {
     title: 'RechtAI',
@@ -161,7 +165,8 @@ export const translations = {
     alreadyHaveAccount: 'Уже есть аккаунт?',
     dontHaveAccount: 'Нет аккаунта?',
     signUpHere: 'Зарегистрируйтесь здесь',
-    signInHere: 'Войдите здесь'
+    signInHere: 'Войдите здесь',
+    languages: 'Языки'
   },
   fr: {
     title: 'RechtAI',
@@ -193,7 +198,8 @@ export const translations = {
     alreadyHaveAccount: 'Vous avez déjà un compte?',
     dontHaveAccount: "Vous n'avez pas de compte?",
     signUpHere: 'Inscrivez-vous ici',
-    signInHere: 'Connectez-vous ici'
+    signInHere: 'Connectez-vous ici',
+    languages: 'Langues'
   }
 };
 
