@@ -22,8 +22,8 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <LanguageProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <LanguageProvider>
           <BrowserRouter>
             <Layout>
               <Routes>
@@ -37,8 +37,8 @@ const App = () => (
               </Routes>
             </Layout>
           </BrowserRouter>
-        </AuthProvider>
-      </LanguageProvider>
+        </LanguageProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

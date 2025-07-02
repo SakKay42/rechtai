@@ -41,17 +41,20 @@ const getInitialLanguage = (): Language => {
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<Language>(getInitialLanguage());
-  const { user, profile } = useAuth();
+  const authContext = useAuth();
   const t = useTranslations(language);
+
+  // Safely access auth context with null check
+  const { user, profile, loading } = authContext || { user: null, profile: null, loading: true };
 
   // Load user's preferred language from profile when user logs in
   useEffect(() => {
-    if (user && profile?.preferred_language) {
+    if (!loading && user && profile?.preferred_language) {
       console.log('🌍 Loading language from user profile:', profile.preferred_language);
       setLanguageState(profile.preferred_language as Language);
       localStorage.setItem('preferred_language', profile.preferred_language);
     }
-  }, [user, profile]);
+  }, [user, profile, loading]);
 
   const setLanguage = async (newLanguage: Language) => {
     console.log('🌍 Setting language to:', newLanguage);
@@ -62,8 +65,8 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Save to localStorage
     localStorage.setItem('preferred_language', newLanguage);
     
-    // Update user profile if logged in
-    if (user) {
+    // Update user profile if logged in and not loading
+    if (user && !loading) {
       try {
         const { error } = await supabase
           .from('profiles')
