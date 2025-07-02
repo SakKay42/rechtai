@@ -14,7 +14,7 @@ export type Database = {
           completed_at: string | null
           created_at: string
           id: string
-          language: Database["public"]["Enums"]["app_language"]
+          language: string
           legal_topic: string | null
           messages: Json
           status: Database["public"]["Enums"]["chat_status"]
@@ -27,7 +27,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           id?: string
-          language: Database["public"]["Enums"]["app_language"]
+          language: string
           legal_topic?: string | null
           messages?: Json
           status?: Database["public"]["Enums"]["chat_status"]
@@ -40,7 +40,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           id?: string
-          language?: Database["public"]["Enums"]["app_language"]
+          language?: string
           legal_topic?: string | null
           messages?: Json
           status?: Database["public"]["Enums"]["chat_status"]

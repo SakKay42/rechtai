@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, Globe } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -89,6 +89,9 @@ export const Chat: React.FC = () => {
     const userMessage = message.trim();
     setMessage('');
     setIsLoading(true);
+
+    // Debug logging for language
+    console.log('🌍 Sending message with language:', language);
 
     try {
       // Add user message to current chat immediately for better UX
@@ -230,7 +233,13 @@ export const Chat: React.FC = () => {
         <div className="flex-1">
           <Card className="h-full flex flex-col">
             <CardHeader>
-              <CardTitle>{currentChat ? currentChat.title : t.chat}</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>{currentChat ? currentChat.title : t.chat}</CardTitle>
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <Globe className="h-4 w-4" />
+                  <span>{language.toUpperCase()}</span>
+                </div>
+              </div>
             </CardHeader>
             
             <CardContent className="flex-1 flex flex-col p-0">
@@ -264,6 +273,10 @@ export const Chat: React.FC = () => {
                     <div className="text-center">
                       <p className="text-lg mb-2">{t.getHelp}</p>
                       <p className="text-sm">{t.description}</p>
+                      <div className="flex items-center justify-center gap-2 mt-4 text-xs">
+                        <Globe className="h-3 w-3" />
+                        <span>Language: {language.toUpperCase()}</span>
+                      </div>
                     </div>
                   </div>
                 )}

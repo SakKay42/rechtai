@@ -36,6 +36,10 @@ serve(async (req) => {
 
     const { message, chatId, language = 'nl' } = await req.json();
 
+    // Debug logging for language
+    console.log('🌍 Language received from client:', language);
+    console.log('🌍 User ID:', user.id);
+
     if (!message) {
       throw new Error('Message is required');
     }
@@ -127,8 +131,11 @@ serve(async (req) => {
     messages.push(userMessage);
 
     // Prepare messages for OpenAI (convert format and limit history)
+    const systemPrompt = systemPrompts[language] || systemPrompts.nl;
+    console.log('🌍 Using system prompt for language:', language);
+    
     const openAIMessages = [
-      { role: 'system', content: systemPrompts[language] || systemPrompts.nl },
+      { role: 'system', content: systemPrompt },
       ...messages.slice(-10).map(msg => ({
         role: msg.role === 'user' ? 'user' : 'assistant',
         content: msg.content
@@ -183,7 +190,7 @@ serve(async (req) => {
       // Don't throw error here, as we still want to return the AI response
     }
 
-    console.log(`Successfully processed chat request for session ${currentChatId}`);
+    console.log(`✅ Successfully processed chat request for session ${currentChatId} in language ${language}`);
 
     return new Response(
       JSON.stringify({
