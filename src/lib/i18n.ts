@@ -1,4 +1,3 @@
-
 export const languages = ['nl', 'en', 'ar', 'es', 'ru', 'fr'] as const;
 export type Language = typeof languages[number];
 
@@ -34,7 +33,14 @@ export const translations = {
     dontHaveAccount: 'Heeft u nog geen account?',
     signUpHere: 'Registreer hier',
     signInHere: 'Log hier in',
-    languages: 'Talen'
+    languages: 'Talen',
+    chatLimitReached: 'Chat limiet bereikt',
+    upgradeForUnlimited: 'Upgrade naar Premium voor onbeperkte chats',
+    messageSent: 'Bericht verzonden',
+    aiResponseReceived: 'AI antwoord ontvangen',
+    error: 'Fout',
+    failedToSendMessage: 'Kon bericht niet verzenden',
+    typeYourLegalQuestion: 'Typ uw juridische vraag...'
   },
   en: {
     title: 'RechtAI',
@@ -67,7 +73,14 @@ export const translations = {
     dontHaveAccount: "Don't have an account?",
     signUpHere: 'Sign up here',
     signInHere: 'Sign in here',
-    languages: 'Languages'
+    languages: 'Languages',
+    chatLimitReached: 'Chat limit reached',
+    upgradeForUnlimited: 'Upgrade to Premium for unlimited chats',
+    messageSent: 'Message sent',
+    aiResponseReceived: 'AI response received',
+    error: 'Error',
+    failedToSendMessage: 'Failed to send message',
+    typeYourLegalQuestion: 'Type your legal question...'
   },
   ar: {
     title: 'RechtAI',
@@ -100,7 +113,14 @@ export const translations = {
     dontHaveAccount: 'ليس لديك حساب؟',
     signUpHere: 'سجل هنا',
     signInHere: 'سجل الدخول هنا',
-    languages: 'اللغات'
+    languages: 'اللغات',
+    chatLimitReached: 'تم الوصول لحد المحادثات',
+    upgradeForUnlimited: 'ترقية للمميز للمحادثات غير المحدودة',
+    messageSent: 'تم إرسال الرسالة',
+    aiResponseReceived: 'تم استلام رد الذكي الاصطناعي',
+    error: 'خطأ',
+    failedToSendMessage: 'فشل في إرسال الرسالة',
+    typeYourLegalQuestion: 'اكتب سؤالك القانوني...'
   },
   es: {
     title: 'RechtAI',
@@ -133,7 +153,14 @@ export const translations = {
     dontHaveAccount: '¿No tienes una cuenta?',
     signUpHere: 'Regístrate aquí',
     signInHere: 'Inicia sesión aquí',
-    languages: 'Idiomas'
+    languages: 'Idiomas',
+    chatLimitReached: 'Límite de chat alcanzado',
+    upgradeForUnlimited: 'Actualiza a Premium para chats ilimitados',
+    messageSent: 'Mensaje enviado',
+    aiResponseReceived: 'Respuesta de IA recibida',
+    error: 'Error',
+    failedToSendMessage: 'Error al enviar mensaje',
+    typeYourLegalQuestion: 'Escribe tu pregunta legal...'
   },
   ru: {
     title: 'RechtAI',
@@ -166,7 +193,14 @@ export const translations = {
     dontHaveAccount: 'Нет аккаунта?',
     signUpHere: 'Зарегистрируйтесь здесь',
     signInHere: 'Войдите здесь',
-    languages: 'Языки'
+    languages: 'Языки',
+    chatLimitReached: 'Лимит чатов достигнут',
+    upgradeForUnlimited: 'Обновите до Premium для неограниченных чатов',
+    messageSent: 'Сообщение отправлено',
+    aiResponseReceived: 'Ответ ИИ получен',
+    error: 'Ошибка',
+    failedToSendMessage: 'Не удалось отправить сообщение',
+    typeYourLegalQuestion: 'Введите ваш правовой вопрос...'
   },
   fr: {
     title: 'RechtAI',
@@ -199,7 +233,14 @@ export const translations = {
     dontHaveAccount: "Vous n'avez pas de compte?",
     signUpHere: 'Inscrivez-vous ici',
     signInHere: 'Connectez-vous ici',
-    languages: 'Langues'
+    languages: 'Langues',
+    chatLimitReached: 'Limite de chat atteinte',
+    upgradeForUnlimited: 'Passez à Premium pour des chats illimités',
+    messageSent: 'Message envoyé',
+    aiResponseReceived: 'Réponse IA reçue',
+    error: 'Erreur',
+    failedToSendMessage: 'Échec de l\'envoi du message',
+    typeYourLegalQuestion: 'Tapez votre question juridique...'
   }
 };
 
