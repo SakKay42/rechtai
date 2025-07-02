@@ -23,6 +23,14 @@ interface ChatSession {
   created_at: string;
 }
 
+interface ChatHistoryItem {
+  id: string;
+  title: string;
+  messages: any; // Json type from Supabase
+  created_at: string;
+  updated_at: string;
+}
+
 export const Chat: React.FC = () => {
   const { t, language } = useLanguage();
   const { user } = useAuth();
@@ -58,7 +66,16 @@ export const Chat: React.FC = () => {
         .limit(10);
 
       if (error) throw error;
-      setChatHistory(data || []);
+      
+      // Convert Supabase data to our ChatSession format
+      const convertedHistory: ChatSession[] = (data || []).map((item: ChatHistoryItem) => ({
+        id: item.id,
+        title: item.title,
+        messages: Array.isArray(item.messages) ? item.messages : [],
+        created_at: item.created_at
+      }));
+      
+      setChatHistory(convertedHistory);
     } catch (error) {
       console.error('Error loading chat history:', error);
     }
