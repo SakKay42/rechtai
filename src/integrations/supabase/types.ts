@@ -177,6 +177,7 @@ export type Database = {
           email: string
           first_name: string | null
           id: string
+          is_premium: boolean | null
           last_name: string | null
           preferred_language: Database["public"]["Enums"]["app_language"]
           role: Database["public"]["Enums"]["user_role"]
@@ -189,6 +190,7 @@ export type Database = {
           email: string
           first_name?: string | null
           id: string
+          is_premium?: boolean | null
           last_name?: string | null
           preferred_language?: Database["public"]["Enums"]["app_language"]
           role?: Database["public"]["Enums"]["user_role"]
@@ -201,6 +203,7 @@ export type Database = {
           email?: string
           first_name?: string | null
           id?: string
+          is_premium?: boolean | null
           last_name?: string | null
           preferred_language?: Database["public"]["Enums"]["app_language"]
           role?: Database["public"]["Enums"]["user_role"]
