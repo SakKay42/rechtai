@@ -8,22 +8,76 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Validate environment variables at startup
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 const supabaseUrl = Deno.env.get('SUPABASE_URL');
 const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
 
+function validateEnvironmentVariables() {
+  const missing = [];
+  if (!openAIApiKey) missing.push('OPENAI_API_KEY');
+  if (!supabaseUrl) missing.push('SUPABASE_URL');
+  if (!supabaseAnonKey) missing.push('SUPABASE_ANON_KEY');
+  
+  if (missing.length > 0) {
+    console.error('Missing required environment variables:', missing);
+    return false;
+  }
+  return true;
+}
+
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Validate environment variables
+    if (!validateEnvironmentVariables()) {
+      console.error('Environment validation failed');
+      return new Response(
+        JSON.stringify({ 
+          error: 'Server configuration error',
+          success: false 
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Validate request method
+    if (req.method !== 'POST') {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Method not allowed',
+          success: false 
+        }),
+        {
+          status: 405,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
     const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
     
-    // Get user from JWT token
+    // Get user from JWT token with better error handling
     const authHeader = req.headers.get('authorization');
     if (!authHeader) {
-      throw new Error('No authorization header');
+      console.error('No authorization header provided');
+      return new Response(
+        JSON.stringify({ 
+          error: 'Authorization required',
+          success: false 
+        }),
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     const { data: { user }, error: authError } = await supabase.auth.getUser(
@@ -31,40 +85,102 @@ serve(async (req) => {
     );
 
     if (authError || !user) {
-      throw new Error('Invalid token');
+      console.error('Auth error:', authError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid token',
+          success: false 
+        }),
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
-    const { message, chatId, language = 'nl' } = await req.json();
+    // Parse request body with error handling
+    let requestBody;
+    try {
+      requestBody = await req.json();
+    } catch (parseError) {
+      console.error('Failed to parse request body:', parseError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid request body',
+          success: false 
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    const { message, chatId, language = 'nl' } = requestBody;
+
+    // Validate required fields
+    if (!message || typeof message !== 'string' || message.trim().length === 0) {
+      console.error('Missing or invalid message field');
+      return new Response(
+        JSON.stringify({ 
+          error: 'Message is required and must be non-empty',
+          success: false 
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
 
     // Debug logging for language
     console.log('🌍 Language received from client:', language);
     console.log('🌍 User ID:', user.id);
-
-    if (!message) {
-      throw new Error('Message is required');
-    }
-
     console.log(`Processing chat request for user ${user.id} in language ${language}`);
 
     // Check if user can create new chat (for new chats)
     if (!chatId) {
-      const { data: canCreate, error: limitError } = await supabase.rpc('can_create_chat', {
-        user_uuid: user.id
-      });
+      try {
+        const { data: canCreate, error: limitError } = await supabase.rpc('can_create_chat', {
+          user_uuid: user.id
+        });
 
-      if (limitError) {
-        console.error('Error checking chat limits:', limitError);
-        throw new Error('Error checking chat limits');
-      }
+        if (limitError) {
+          console.error('Error checking chat limits:', limitError);
+          return new Response(
+            JSON.stringify({ 
+              error: 'Error checking chat limits',
+              success: false 
+            }),
+            {
+              status: 500,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
+        }
 
-      if (!canCreate) {
+        if (!canCreate) {
+          return new Response(
+            JSON.stringify({ 
+              error: 'Chat limit reached',
+              type: 'LIMIT_REACHED',
+              success: false
+            }),
+            {
+              status: 403,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
+        }
+      } catch (rpcError) {
+        console.error('RPC call failed:', rpcError);
         return new Response(
           JSON.stringify({ 
-            error: 'Chat limit reached',
-            type: 'LIMIT_REACHED'
+            error: 'Failed to check chat limits',
+            success: false 
           }),
           {
-            status: 403,
+            status: 500,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           }
         );
@@ -86,40 +202,86 @@ serve(async (req) => {
 
     // If continuing existing chat, get message history
     if (currentChatId) {
-      const { data: chatData, error: chatError } = await supabase
-        .from('chat_sessions')
-        .select('messages, title')
-        .eq('id', currentChatId)
-        .eq('user_id', user.id)
-        .single();
+      try {
+        const { data: chatData, error: chatError } = await supabase
+          .from('chat_sessions')
+          .select('messages, title')
+          .eq('id', currentChatId)
+          .eq('user_id', user.id)
+          .single();
 
-      if (chatError) {
-        console.error('Error fetching chat:', chatError);
-        throw new Error('Error fetching chat');
+        if (chatError) {
+          console.error('Error fetching chat:', chatError);
+          return new Response(
+            JSON.stringify({ 
+              error: 'Error fetching chat',
+              success: false 
+            }),
+            {
+              status: 404,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
+        }
+
+        messages = Array.isArray(chatData.messages) ? chatData.messages : [];
+      } catch (chatFetchError) {
+        console.error('Failed to fetch chat:', chatFetchError);
+        return new Response(
+          JSON.stringify({ 
+            error: 'Failed to fetch chat',
+            success: false 
+          }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
       }
-
-      messages = Array.isArray(chatData.messages) ? chatData.messages : [];
     } else {
       // Create new chat session
-      const chatTitle = message.length > 50 ? message.substring(0, 50) + '...' : message;
-      
-      const { data: newChat, error: createError } = await supabase
-        .from('chat_sessions')
-        .insert({
-          user_id: user.id,
-          title: chatTitle,
-          language: language,
-          messages: []
-        })
-        .select()
-        .single();
+      try {
+        const chatTitle = message.length > 50 ? message.substring(0, 50) + '...' : message;
+        
+        const { data: newChat, error: createError } = await supabase
+          .from('chat_sessions')
+          .insert({
+            user_id: user.id,
+            title: chatTitle,
+            language: language,
+            messages: []
+          })
+          .select()
+          .single();
 
-      if (createError) {
-        console.error('Error creating chat:', createError);
-        throw new Error('Error creating chat');
+        if (createError) {
+          console.error('Error creating chat:', createError);
+          return new Response(
+            JSON.stringify({ 
+              error: 'Error creating chat',
+              success: false 
+            }),
+            {
+              status: 500,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
+        }
+
+        currentChatId = newChat.id;
+      } catch (chatCreateError) {
+        console.error('Failed to create chat:', chatCreateError);
+        return new Response(
+          JSON.stringify({ 
+            error: 'Failed to create chat',
+            success: false 
+          }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
       }
-
-      currentChatId = newChat.id;
     }
 
     // Add user message to messages array
@@ -137,7 +299,7 @@ serve(async (req) => {
     const openAIMessages = [
       { 
         role: 'system', 
-        content: "You are a friendly legal assistant helping people in the Netherlands understand their everyday legal problems. You communicate in simple, clear language, always matching the user's preferred language (Dutch, English, Russian, French, Arabic, or Spanish). You do not give official legal conclusions, but instead you explain possible solution options, referring to all applicable Dutch laws, codes, and legal frameworks, including civil, criminal, administrative, labor, and other branches of law, as well as legal practice and precedents."
+        content: systemPrompt
       },
       ...messages.slice(-10).map(msg => ({
         role: msg.role === 'user' ? 'user' : 'assistant',
@@ -147,29 +309,97 @@ serve(async (req) => {
 
     console.log(`Sending request to OpenAI with ${openAIMessages.length} messages`);
 
-    // Call OpenAI API
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: openAIMessages,
-        temperature: 0.7,
-        max_tokens: 1500,
-      }),
-    });
+    // Call OpenAI API with enhanced error handling
+    let response;
+    try {
+      response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: openAIMessages,
+          temperature: 0.7,
+          max_tokens: 1500,
+        }),
+      });
+    } catch (fetchError) {
+      console.error('Failed to call OpenAI API:', fetchError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Failed to connect to AI service',
+          success: false 
+        }),
+        {
+          status: 503,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('OpenAI API error:', errorText);
-      throw new Error(`OpenAI API error: ${response.status}`);
+      console.error('OpenAI API error:', response.status, errorText);
+      return new Response(
+        JSON.stringify({ 
+          error: `AI service error: ${response.status}`,
+          success: false 
+        }),
+        {
+          status: 502,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
-    const data = await response.json();
-    const aiResponse = data.choices[0].message.content;
+    let data;
+    try {
+      data = await response.json();
+    } catch (jsonError) {
+      console.error('Failed to parse OpenAI response:', jsonError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid response from AI service',
+          success: false 
+        }),
+        {
+          status: 502,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Validate OpenAI response structure
+    if (!data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
+      console.error('Invalid OpenAI response structure:', data);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid response from AI service',
+          success: false 
+        }),
+        {
+          status: 502,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    const aiResponse = data.choices[0]?.message?.content;
+    if (!aiResponse || typeof aiResponse !== 'string') {
+      console.error('Missing or invalid AI response content:', data.choices[0]);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Empty response from AI service',
+          success: false 
+        }),
+        {
+          status: 502,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
 
     // Add AI response to messages
     const aiMessage = {
@@ -180,17 +410,23 @@ serve(async (req) => {
     messages.push(aiMessage);
 
     // Update chat session with new messages
-    const { error: updateError } = await supabase
-      .from('chat_sessions')
-      .update({
-        messages: messages,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', currentChatId);
+    try {
+      const { error: updateError } = await supabase
+        .from('chat_sessions')
+        .update({
+          messages: messages,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', currentChatId);
 
-    if (updateError) {
-      console.error('Error updating chat:', updateError);
-      // Don't throw error here, as we still want to return the AI response
+      if (updateError) {
+        console.error('Error updating chat:', updateError);
+        // Don't return error here, as we still want to return the AI response
+        // The response was generated successfully, just the storage failed
+      }
+    } catch (updateChatError) {
+      console.error('Failed to update chat:', updateChatError);
+      // Continue to return the response even if storage failed
     }
 
     console.log(`✅ Successfully processed chat request for session ${currentChatId} in language ${language}`);
@@ -207,11 +443,11 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error in chat-with-ai function:', error);
+    console.error('Unhandled error in Edge Function:', error);
     
     return new Response(
       JSON.stringify({ 
-        error: error.message || 'Internal server error',
+        error: 'Internal server error',
         success: false 
       }),
       {
