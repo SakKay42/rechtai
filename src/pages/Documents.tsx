@@ -22,7 +22,10 @@ export const Documents: React.FC = () => {
     );
   }
 
-  if (profile?.role !== 'premium' && profile?.role !== 'admin') {
+  // Check if user has premium access (either is_premium flag or premium/admin role)
+  const hasPremiumAccess = profile?.is_premium || profile?.role === 'premium' || profile?.role === 'admin';
+
+  if (!hasPremiumAccess) {
     return (
       <div className="container mx-auto px-4 py-8">
         <Card>
