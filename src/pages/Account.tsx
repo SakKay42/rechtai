@@ -65,19 +65,19 @@ export const Account: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'text-green-600 bg-green-100';
-      case 'completed': return 'text-blue-600 bg-blue-100';
-      case 'archived': return 'text-gray-600 bg-gray-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'active': return 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30';
+      case 'completed': return 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30';
+      case 'archived': return 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-800';
+      default: return 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-800';
     }
   };
 
   if (!user) {
     return (
       <div className="container mx-auto px-4 py-16">
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardContent className="text-center py-8">
-            <p className="text-lg">{t.loginToAccount}</p>
+            <p className="text-lg dark:text-white">{t.loginToAccount}</p>
           </CardContent>
         </Card>
       </div>
@@ -87,9 +87,9 @@ export const Account: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid gap-6">
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 dark:text-white">
               <User className="h-5 w-5" />
               {t.account}
             </CardTitle>
@@ -97,23 +97,23 @@ export const Account: React.FC = () => {
           <CardContent>
             <div className="space-y-4">
               <div>
-                <p className="font-medium">Email:</p>
-                <p className="text-gray-600">{user.email}</p>
+                <p className="font-medium dark:text-white">Email:</p>
+                <p className="text-gray-600 dark:text-gray-300">{user.email}</p>
               </div>
               {profile && (
                 <>
                   <div>
-                    <p className="font-medium">{t.firstName}:</p>
-                    <p className="text-gray-600">{profile.first_name || 'Not set'}</p>
+                    <p className="font-medium dark:text-white">{t.firstName}:</p>
+                    <p className="text-gray-600 dark:text-gray-300">{profile.first_name || 'Not set'}</p>
                   </div>
                   <div>
-                    <p className="font-medium">{t.lastName}:</p>
-                    <p className="text-gray-600">{profile.last_name || 'Not set'}</p>
+                    <p className="font-medium dark:text-white">{t.lastName}:</p>
+                    <p className="text-gray-600 dark:text-gray-300">{profile.last_name || 'Not set'}</p>
                   </div>
                   <div>
-                    <p className="font-medium">Subscription:</p>
+                    <p className="font-medium dark:text-white">Subscription:</p>
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-600 capitalize">{profile.role}</span>
+                      <span className="text-gray-600 dark:text-gray-300 capitalize">{profile.role}</span>
                       {profile.is_premium && (
                         <span className="px-2 py-1 bg-[#FF6600] text-white text-xs rounded-full">
                           Premium
@@ -122,8 +122,8 @@ export const Account: React.FC = () => {
                     </div>
                   </div>
                   <div>
-                    <p className="font-medium">Chats this month:</p>
-                    <p className="text-gray-600">{profile.chat_count_current_month}</p>
+                    <p className="font-medium dark:text-white">Chats this month:</p>
+                    <p className="text-gray-600 dark:text-gray-300">{profile.chat_count_current_month}</p>
                   </div>
                 </>
               )}
@@ -131,9 +131,9 @@ export const Account: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 dark:text-white">
               <MessageSquare className="h-5 w-5" />
               {t.history}
             </CardTitle>
@@ -148,15 +148,15 @@ export const Account: React.FC = () => {
                 {chatHistory.map((chat) => (
                   <div
                     key={chat.id}
-                    className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                    className="p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:border-gray-600 cursor-pointer transition-colors"
                     onClick={() => handleChatClick(chat.id)}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h4 className="font-medium text-gray-900 mb-1 line-clamp-1">
+                        <h4 className="font-medium text-gray-900 dark:text-white mb-1 line-clamp-1">
                           {chat.title}
                         </h4>
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                           <div className="flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
                             {formatDate(chat.updated_at)}
@@ -178,8 +178,8 @@ export const Account: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                <MessageSquare className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <MessageSquare className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
                 <p>No chat history yet</p>
                 <p className="text-sm">Start your first conversation to see it here</p>
                 <Button 

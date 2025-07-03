@@ -42,7 +42,10 @@ export const translations = {
     premium: 'Premium',
     unlimited: 'Unlimited',
     chatsPerMonth: 'chats per month',
-    documentGeneration: 'Document Generation'
+    documentGeneration: 'Document Generation',
+    theme: 'Theme',
+    darkMode: 'Dark Mode',
+    lightMode: 'Light Mode'
   },
   nl: {
     title: 'RechtAI',
@@ -86,7 +89,10 @@ export const translations = {
     premium: 'Premium',
     unlimited: 'Onbeperkt',
     chatsPerMonth: 'chats per maand',
-    documentGeneration: 'Document Generatie'
+    documentGeneration: 'Document Generatie',
+    theme: 'Thema',
+    darkMode: 'Donkere Modus',
+    lightMode: 'Lichte Modus'
   },
   ru: {
     title: 'RechtAI',
@@ -130,7 +136,10 @@ export const translations = {
     premium: 'Премиум',
     unlimited: 'Неограниченно',
     chatsPerMonth: 'чатов в месяц',
-    documentGeneration: 'Генерация документов'
+    documentGeneration: 'Генерация документов',
+    theme: 'Тема',
+    darkMode: 'Темный Режим',
+    lightMode: 'Светлый Режим'
   },
   fr: {
     title: 'RechtAI',
@@ -174,7 +183,10 @@ export const translations = {
     premium: 'Premium',
     unlimited: 'Illimité',
     chatsPerMonth: 'chats par mois',
-    documentGeneration: 'Génération de documents'
+    documentGeneration: 'Génération de documents',
+    theme: 'Thème',
+    darkMode: 'Mode Sombre',
+    lightMode: 'Mode Clair'
   },
   es: {
     title: 'RechtAI',
@@ -218,7 +230,10 @@ export const translations = {
     premium: 'Premium',
     unlimited: 'Ilimitado',
     chatsPerMonth: 'chats por mes',
-    documentGeneration: 'Generación de documentos'
+    documentGeneration: 'Generación de documentos',
+    theme: 'Tema',
+    darkMode: 'Modo Oscuro',
+    lightMode: 'Modo Claro'
   },
   ar: {
     title: 'RechtAI',
@@ -262,7 +277,10 @@ export const translations = {
     premium: 'بريميوم',
     unlimited: 'غير محدود',
     chatsPerMonth: 'محادثات في الشهر',
-    documentGeneration: 'توليد الوثائق'
+    documentGeneration: 'توليد الوثائق',
+    theme: 'السمة',
+    darkMode: 'الوضع المظلم',
+    lightMode: 'الوضع الفاتح'
   }
 };
 

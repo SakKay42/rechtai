@@ -3,6 +3,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -11,7 +12,7 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,14 +24,27 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const getUserDisplayName = () => {
+    if (profile?.first_name && profile?.last_name) {
+      return `${profile.first_name} ${profile.last_name}`;
+    }
+    if (profile?.first_name) {
+      return profile.first_name;
+    }
+    if (user?.email) {
+      return user.email.split('@')[0];
+    }
+    return 'User';
+  };
+
   return (
-    <div className="min-h-screen bg-white">
-      <header className="border-b border-gray-200 bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-8">
               <h1 
-                className="text-2xl font-bold text-black cursor-pointer" 
+                className="text-2xl font-bold text-black dark:text-white cursor-pointer" 
                 onClick={() => navigate('/')}
               >
                 {t.title}
@@ -73,12 +87,13 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
 
             <div className="flex items-center space-x-4">
+              <ThemeToggle />
               <LanguageSelector />
               
               {user ? (
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-600">
-                    {user.email}
+                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                    {getUserDisplayName()}
                   </span>
                   <Button variant="outline" onClick={handleSignOut}>
                     {t.logout}
@@ -102,7 +117,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </header>
       
-      <main>{children}</main>
+      <main className="dark:bg-gray-900 dark:text-white">{children}</main>
     </div>
   );
 };
