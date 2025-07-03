@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -239,9 +238,9 @@ export const Chat: React.FC = () => {
   if (!user) {
     return (
       <div className="container mx-auto px-4 py-16">
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardContent className="text-center py-8">
-            <p className="text-lg">{t.loginToAccount}</p>
+            <p className="text-lg dark:text-gray-100">{t.loginToAccount}</p>
           </CardContent>
         </Card>
       </div>
@@ -249,13 +248,13 @@ export const Chat: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex gap-4 h-[calc(100vh-12rem)]">
+    <div className="container mx-auto px-4 py-8 overflow-hidden">
+      <div className="flex gap-4 h-[80vh] overflow-hidden">
         {/* Chat History Sidebar */}
         <div className="w-1/4 min-w-[250px]">
-          <Card className="h-full">
+          <Card className="h-full dark:bg-gray-800 dark:border-gray-700">
             <CardHeader>
-              <CardTitle className="text-sm">{t.history}</CardTitle>
+              <CardTitle className="text-sm dark:text-gray-100">{t.history}</CardTitle>
               <Button 
                 onClick={startNewChat}
                 size="sm"
@@ -271,7 +270,11 @@ export const Chat: React.FC = () => {
                     <Button
                       key={chat.id}
                       variant={currentChat?.id === chat.id ? "default" : "ghost"}
-                      className="w-full justify-start text-left h-auto p-3 whitespace-normal"
+                      className={`w-full justify-start text-left h-auto p-3 whitespace-normal ${
+                        currentChat?.id === chat.id 
+                          ? 'bg-[#FF6600] hover:bg-[#FF6600]/90 text-white' 
+                          : 'dark:text-gray-100 dark:hover:bg-gray-700'
+                      }`}
                       onClick={() => selectChat(chat)}
                     >
                       <div className="truncate text-sm">
@@ -287,11 +290,11 @@ export const Chat: React.FC = () => {
 
         {/* Main Chat Area */}
         <div className="flex-1">
-          <Card className="h-full flex flex-col">
+          <Card className="h-full flex flex-col dark:bg-gray-800 dark:border-gray-700">
             <CardHeader className="flex-shrink-0">
               <div className="flex items-center justify-between">
-                <CardTitle>{currentChat ? currentChat.title : t.chat}</CardTitle>
-                <div className="flex items-center gap-2 text-sm text-gray-500">
+                <CardTitle className="dark:text-gray-100">{currentChat ? currentChat.title : t.chat}</CardTitle>
+                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                   <Globe className="h-4 w-4" />
                   <span>{language.toUpperCase()}</span>
                 </div>
@@ -300,7 +303,7 @@ export const Chat: React.FC = () => {
             
             <CardContent className="flex-1 flex flex-col p-0 min-h-0">
               {/* Messages Area */}
-              <div className="flex-1 min-h-0">
+              <div className="flex-1 min-h-0 overflow-hidden">
                 <ScrollArea className="h-full p-4">
                   {currentChat?.messages.length ? (
                     <div className="space-y-4">
@@ -313,7 +316,7 @@ export const Chat: React.FC = () => {
                             className={`max-w-[80%] p-3 rounded-lg ${
                               msg.role === 'user'
                                 ? 'bg-[#FF6600] text-white'
-                                : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100'
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
                             }`}
                           >
                             <div className="whitespace-pre-wrap">{msg.content}</div>
@@ -341,14 +344,14 @@ export const Chat: React.FC = () => {
               </div>
 
               {/* Message Input */}
-              <div className="border-t p-4 flex-shrink-0">
+              <div className="border-t dark:border-gray-700 p-4 flex-shrink-0">
                 <form onSubmit={handleSendMessage} className="flex gap-2">
                   <Input
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder={t.typeYourLegalQuestion || "Type your legal question..."}
                     disabled={isLoading}
-                    className="flex-1"
+                    className="flex-1 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400"
                   />
                   <Button
                     type="submit"

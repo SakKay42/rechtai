@@ -110,7 +110,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </header>
       
-      <main className="dark:bg-gray-900 dark:text-white">{children}</main>
+      <main className="dark:bg-gray-900 dark:text-white overflow-hidden">{children}</main>
     </div>
   );
 };
