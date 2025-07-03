@@ -8,37 +8,71 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Validate environment variables at startup
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-const supabaseUrl = Deno.env.get('SUPABASE_URL');
-const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
-
+// Enhanced environment validation with detailed logging
 function validateEnvironmentVariables() {
-  const missing = [];
-  if (!openAIApiKey) missing.push('OPENAI_API_KEY');
-  if (!supabaseUrl) missing.push('SUPABASE_URL');
-  if (!supabaseAnonKey) missing.push('SUPABASE_ANON_KEY');
+  console.log('🔧 Validating environment variables...');
+  
+  const requiredVars = {
+    OPENAI_API_KEY: Deno.env.get('OPENAI_API_KEY'),
+    SUPABASE_URL: Deno.env.get('SUPABASE_URL'),
+    SUPABASE_ANON_KEY: Deno.env.get('SUPABASE_ANON_KEY')
+  };
+
+  const missing = Object.entries(requiredVars)
+    .filter(([_, value]) => !value)
+    .map(([key, _]) => key);
   
   if (missing.length > 0) {
-    console.error('Missing required environment variables:', missing);
-    return false;
+    console.error('❌ Missing required environment variables:', missing);
+    return { valid: false, missing };
   }
-  return true;
+  
+  console.log('✅ All environment variables are present');
+  return { valid: true, missing: [] };
+}
+
+// Health check endpoint
+function handleHealthCheck() {
+  const envValidation = validateEnvironmentVariables();
+  
+  return new Response(
+    JSON.stringify({ 
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      environment: envValidation.valid ? 'ok' : 'missing_vars',
+      missing_vars: envValidation.missing
+    }),
+    {
+      status: envValidation.valid ? 200 : 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    }
+  );
 }
 
 serve(async (req) => {
+  console.log(`🚀 Edge Function called: ${req.method} ${req.url}`);
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    console.log('✅ CORS preflight handled');
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Health check endpoint
+  if (req.url.includes('/health')) {
+    console.log('🏥 Health check requested');
+    return handleHealthCheck();
+  }
+
   try {
-    // Validate environment variables
-    if (!validateEnvironmentVariables()) {
-      console.error('Environment validation failed');
+    // Validate environment variables at the start
+    const envValidation = validateEnvironmentVariables();
+    if (!envValidation.valid) {
+      console.error('❌ Environment validation failed');
       return new Response(
         JSON.stringify({ 
-          error: 'Server configuration error',
+          error: 'Server configuration error: Missing environment variables',
+          missing: envValidation.missing,
           success: false 
         }),
         {
@@ -50,6 +84,7 @@ serve(async (req) => {
 
     // Validate request method
     if (req.method !== 'POST') {
+      console.error('❌ Invalid method:', req.method);
       return new Response(
         JSON.stringify({ 
           error: 'Method not allowed',
@@ -62,12 +97,16 @@ serve(async (req) => {
       );
     }
 
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
+
     const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
     
-    // Get user from JWT token with better error handling
+    // Enhanced auth handling
     const authHeader = req.headers.get('authorization');
     if (!authHeader) {
-      console.error('No authorization header provided');
+      console.error('❌ No authorization header provided');
       return new Response(
         JSON.stringify({ 
           error: 'Authorization required',
@@ -80,12 +119,13 @@ serve(async (req) => {
       );
     }
 
+    console.log('🔐 Validating user token...');
     const { data: { user }, error: authError } = await supabase.auth.getUser(
       authHeader.replace('Bearer ', '')
     );
 
     if (authError || !user) {
-      console.error('Auth error:', authError);
+      console.error('❌ Auth error:', authError);
       return new Response(
         JSON.stringify({ 
           error: 'Invalid token',
@@ -98,15 +138,21 @@ serve(async (req) => {
       );
     }
 
-    // Parse request body with error handling
+    console.log('✅ User authenticated:', user.id);
+
+    // Enhanced request body parsing
     let requestBody;
     try {
+      const contentType = req.headers.get('content-type');
+      console.log('📝 Content-Type:', contentType);
+      
       requestBody = await req.json();
+      console.log('📋 Request body parsed successfully');
     } catch (parseError) {
-      console.error('Failed to parse request body:', parseError);
+      console.error('❌ Failed to parse request body:', parseError);
       return new Response(
         JSON.stringify({ 
-          error: 'Invalid request body',
+          error: 'Invalid request body - must be valid JSON',
           success: false 
         }),
         {
@@ -118,12 +164,12 @@ serve(async (req) => {
 
     const { message, chatId, language = 'nl' } = requestBody;
 
-    // Validate required fields
+    // Enhanced input validation
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
-      console.error('Missing or invalid message field');
+      console.error('❌ Invalid message field:', { message, type: typeof message });
       return new Response(
         JSON.stringify({ 
-          error: 'Message is required and must be non-empty',
+          error: 'Message is required and must be non-empty string',
           success: false 
         }),
         {
@@ -133,20 +179,29 @@ serve(async (req) => {
       );
     }
 
-    // Debug logging for language
-    console.log('🌍 Language received from client:', language);
-    console.log('🌍 User ID:', user.id);
-    console.log(`Processing chat request for user ${user.id} in language ${language}`);
+    // Validate language parameter
+    const supportedLanguages = ['nl', 'en', 'ar', 'es', 'ru', 'fr'];
+    if (!supportedLanguages.includes(language)) {
+      console.warn('⚠️ Unsupported language, defaulting to nl:', language);
+    }
 
-    // Check if user can create new chat (for new chats)
+    console.log('🌍 Processing request:', {
+      userId: user.id,
+      language,
+      messageLength: message.length,
+      chatId: chatId || 'new chat'
+    });
+
+    // Check chat limits for new chats
     if (!chatId) {
       try {
+        console.log('📊 Checking chat limits for user...');
         const { data: canCreate, error: limitError } = await supabase.rpc('can_create_chat', {
           user_uuid: user.id
         });
 
         if (limitError) {
-          console.error('Error checking chat limits:', limitError);
+          console.error('❌ Error checking chat limits:', limitError);
           return new Response(
             JSON.stringify({ 
               error: 'Error checking chat limits',
@@ -160,6 +215,7 @@ serve(async (req) => {
         }
 
         if (!canCreate) {
+          console.log('⚠️ Chat limit reached for user:', user.id);
           return new Response(
             JSON.stringify({ 
               error: 'Chat limit reached',
@@ -173,7 +229,7 @@ serve(async (req) => {
           );
         }
       } catch (rpcError) {
-        console.error('RPC call failed:', rpcError);
+        console.error('❌ RPC call failed:', rpcError);
         return new Response(
           JSON.stringify({ 
             error: 'Failed to check chat limits',
@@ -187,7 +243,7 @@ serve(async (req) => {
       }
     }
 
-    // System prompts for different languages
+    // Enhanced system prompts
     const systemPrompts: Record<string, string> = {
       nl: "Je bent een AI-assistent gespecialiseerd in Nederlands recht. Je helpt mensen met juridische vragen en geeft begrijpelijke uitleg over Nederlandse wetgeving. Antwoord altijd in het Nederlands, ook als de vraag in een andere taal wordt gesteld. Geef praktische en heldere juridische informatie, maar vermeld altijd dat dit geen vervanging is voor professioneel juridisch advies.",
       en: "You are an AI assistant specialized in Dutch law. You help people with legal questions and provide understandable explanations about Dutch legislation. Always respond in English when the user writes in English. Give practical and clear legal information, but always mention that this is not a replacement for professional legal advice.",
@@ -200,9 +256,10 @@ serve(async (req) => {
     let currentChatId = chatId;
     let messages: any[] = [];
 
-    // If continuing existing chat, get message history
+    // Handle existing chat retrieval
     if (currentChatId) {
       try {
+        console.log('📖 Fetching existing chat:', currentChatId);
         const { data: chatData, error: chatError } = await supabase
           .from('chat_sessions')
           .select('messages, title')
@@ -211,10 +268,10 @@ serve(async (req) => {
           .single();
 
         if (chatError) {
-          console.error('Error fetching chat:', chatError);
+          console.error('❌ Error fetching chat:', chatError);
           return new Response(
             JSON.stringify({ 
-              error: 'Error fetching chat',
+              error: 'Chat not found or access denied',
               success: false 
             }),
             {
@@ -225,8 +282,9 @@ serve(async (req) => {
         }
 
         messages = Array.isArray(chatData.messages) ? chatData.messages : [];
+        console.log('✅ Loaded', messages.length, 'existing messages');
       } catch (chatFetchError) {
-        console.error('Failed to fetch chat:', chatFetchError);
+        console.error('❌ Failed to fetch chat:', chatFetchError);
         return new Response(
           JSON.stringify({ 
             error: 'Failed to fetch chat',
@@ -241,6 +299,7 @@ serve(async (req) => {
     } else {
       // Create new chat session
       try {
+        console.log('✨ Creating new chat session...');
         const chatTitle = message.length > 50 ? message.substring(0, 50) + '...' : message;
         
         const { data: newChat, error: createError } = await supabase
@@ -255,10 +314,10 @@ serve(async (req) => {
           .single();
 
         if (createError) {
-          console.error('Error creating chat:', createError);
+          console.error('❌ Error creating chat:', createError);
           return new Response(
             JSON.stringify({ 
-              error: 'Error creating chat',
+              error: 'Failed to create chat session',
               success: false 
             }),
             {
@@ -269,8 +328,9 @@ serve(async (req) => {
         }
 
         currentChatId = newChat.id;
+        console.log('✅ Created new chat:', currentChatId);
       } catch (chatCreateError) {
-        console.error('Failed to create chat:', chatCreateError);
+        console.error('❌ Failed to create chat:', chatCreateError);
         return new Response(
           JSON.stringify({ 
             error: 'Failed to create chat',
@@ -292,9 +352,9 @@ serve(async (req) => {
     };
     messages.push(userMessage);
 
-    // Prepare messages for OpenAI (convert format and limit history)
+    // Prepare messages for OpenAI with correct system prompt
     const systemPrompt = systemPrompts[language] || systemPrompts.nl;
-    console.log('🌍 Using system prompt for language:', language);
+    console.log('🤖 Using system prompt for language:', language);
     
     const openAIMessages = [
       { 
@@ -307,11 +367,12 @@ serve(async (req) => {
       }))
     ];
 
-    console.log(`Sending request to OpenAI with ${openAIMessages.length} messages`);
+    console.log('📤 Sending request to OpenAI with', openAIMessages.length, 'messages');
 
-    // Call OpenAI API with enhanced error handling
+    // Enhanced OpenAI API call
     let response;
     try {
+      console.log('🔄 Calling OpenAI API...');
       response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -326,7 +387,7 @@ serve(async (req) => {
         }),
       });
     } catch (fetchError) {
-      console.error('Failed to call OpenAI API:', fetchError);
+      console.error('❌ Failed to call OpenAI API:', fetchError);
       return new Response(
         JSON.stringify({ 
           error: 'Failed to connect to AI service',
@@ -341,10 +402,11 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('OpenAI API error:', response.status, errorText);
+      console.error('❌ OpenAI API error:', response.status, errorText);
       return new Response(
         JSON.stringify({ 
           error: `AI service error: ${response.status}`,
+          details: errorText.substring(0, 200),
           success: false 
         }),
         {
@@ -357,8 +419,9 @@ serve(async (req) => {
     let data;
     try {
       data = await response.json();
+      console.log('✅ OpenAI response received');
     } catch (jsonError) {
-      console.error('Failed to parse OpenAI response:', jsonError);
+      console.error('❌ Failed to parse OpenAI response:', jsonError);
       return new Response(
         JSON.stringify({ 
           error: 'Invalid response from AI service',
@@ -371,12 +434,12 @@ serve(async (req) => {
       );
     }
 
-    // Validate OpenAI response structure
+    // Enhanced response validation
     if (!data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
-      console.error('Invalid OpenAI response structure:', data);
+      console.error('❌ Invalid OpenAI response structure:', data);
       return new Response(
         JSON.stringify({ 
-          error: 'Invalid response from AI service',
+          error: 'Invalid response structure from AI service',
           success: false 
         }),
         {
@@ -388,7 +451,7 @@ serve(async (req) => {
 
     const aiResponse = data.choices[0]?.message?.content;
     if (!aiResponse || typeof aiResponse !== 'string') {
-      console.error('Missing or invalid AI response content:', data.choices[0]);
+      console.error('❌ Missing or invalid AI response content:', data.choices[0]);
       return new Response(
         JSON.stringify({ 
           error: 'Empty response from AI service',
@@ -401,6 +464,8 @@ serve(async (req) => {
       );
     }
 
+    console.log('✅ AI response length:', aiResponse.length);
+
     // Add AI response to messages
     const aiMessage = {
       role: 'assistant',
@@ -411,6 +476,7 @@ serve(async (req) => {
 
     // Update chat session with new messages
     try {
+      console.log('💾 Updating chat session with new messages...');
       const { error: updateError } = await supabase
         .from('chat_sessions')
         .update({
@@ -420,16 +486,15 @@ serve(async (req) => {
         .eq('id', currentChatId);
 
       if (updateError) {
-        console.error('Error updating chat:', updateError);
+        console.error('⚠️ Error updating chat (continuing anyway):', updateError);
         // Don't return error here, as we still want to return the AI response
-        // The response was generated successfully, just the storage failed
       }
     } catch (updateChatError) {
-      console.error('Failed to update chat:', updateChatError);
+      console.error('⚠️ Failed to update chat (continuing anyway):', updateChatError);
       // Continue to return the response even if storage failed
     }
 
-    console.log(`✅ Successfully processed chat request for session ${currentChatId} in language ${language}`);
+    console.log('🎉 Successfully processed chat request for session', currentChatId, 'in language', language);
 
     return new Response(
       JSON.stringify({
@@ -443,11 +508,17 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Unhandled error in Edge Function:', error);
+    console.error('💥 Unhandled error in Edge Function:', {
+      error,
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     
     return new Response(
       JSON.stringify({ 
         error: 'Internal server error',
+        message: error.message,
         success: false 
       }),
       {

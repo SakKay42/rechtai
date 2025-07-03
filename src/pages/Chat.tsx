@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -90,8 +89,14 @@ export const Chat: React.FC = () => {
     setMessage('');
     setIsLoading(true);
 
-    // Debug logging for language
+    // Enhanced debugging - log request details
     console.log('🌍 Sending message with language:', language);
+    console.log('🔧 Request details:', {
+      message: userMessage,
+      chatId: currentChat?.id,
+      language: language,
+      userId: user?.id
+    });
 
     try {
       // Add user message to current chat immediately for better UX
@@ -108,6 +113,8 @@ export const Chat: React.FC = () => {
         });
       }
 
+      console.log('📡 Calling Edge Function...');
+      
       const { data, error } = await supabase.functions.invoke('chat-with-ai', {
         body: {
           message: userMessage,
@@ -116,9 +123,22 @@ export const Chat: React.FC = () => {
         }
       });
 
-      if (error) throw error;
+      // Enhanced error logging
+      if (error) {
+        console.error('❌ Supabase function error:', {
+          error,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
+        throw error;
+      }
+
+      console.log('✅ Edge Function response:', data);
 
       if (data?.error) {
+        console.error('❌ Application error from Edge Function:', data.error);
         if (data.type === 'LIMIT_REACHED') {
           toast({
             title: t.chatLimitReached || 'Chat limit reached',
@@ -128,6 +148,11 @@ export const Chat: React.FC = () => {
           return;
         }
         throw new Error(data.error);
+      }
+
+      if (!data?.response) {
+        console.error('❌ Missing response from Edge Function:', data);
+        throw new Error('No response received from AI service');
       }
 
       // Update current chat with AI response
@@ -161,12 +186,42 @@ export const Chat: React.FC = () => {
       });
 
     } catch (error: any) {
-      console.error('Error sending message:', error);
+      console.error('💥 Complete error details:', {
+        error,
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+        cause: error.cause
+      });
+
+      // Enhanced error messages for users
+      let errorMessage = t.failedToSendMessage || 'Failed to send message';
+      let errorTitle = t.error || 'Error';
+
+      if (error.message?.includes('non-2xx status code')) {
+        errorMessage = 'Server returned an error. Please try again in a moment.';
+        errorTitle = 'Service Temporarily Unavailable';
+      } else if (error.message?.includes('network')) {
+        errorMessage = 'Network connection issue. Please check your internet connection.';
+        errorTitle = 'Connection Error';
+      } else if (error.message?.includes('timeout')) {
+        errorMessage = 'Request timed out. Please try again.';
+        errorTitle = 'Timeout Error';
+      }
+
       toast({
-        title: t.error || 'Error',
-        description: error.message || t.failedToSendMessage || 'Failed to send message',
+        title: errorTitle,
+        description: errorMessage,
         variant: 'destructive'
       });
+
+      // Revert optimistic UI update
+      if (currentChat) {
+        setCurrentChat({
+          ...currentChat,
+          messages: currentChat.messages.slice(0, -1) // Remove the optimistically added message
+        });
+      }
     } finally {
       setIsLoading(false);
     }
