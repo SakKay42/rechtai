@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -28,11 +27,18 @@ function validateEnvironmentVariables() {
     return { valid: false, missing };
   }
   
-  console.log('✅ All environment variables are present');
+  // Validate N8N webhook URL format
+  const n8nUrl = requiredVars.N8N_WEBHOOK_URL;
+  if (n8nUrl && !n8nUrl.startsWith('http')) {
+    console.error('❌ Invalid N8N_WEBHOOK_URL format:', n8nUrl);
+    return { valid: false, missing: ['N8N_WEBHOOK_URL (invalid format)'] };
+  }
+  
+  console.log('✅ All environment variables are present and valid');
   return { valid: true, missing: [] };
 }
 
-// N8N webhook call function
+// Enhanced N8N webhook call function with timeout and better logging
 async function callN8NWebhook(data: any, language: string) {
   const n8nWebhookUrl = Deno.env.get('N8N_WEBHOOK_URL');
   
@@ -42,7 +48,14 @@ async function callN8NWebhook(data: any, language: string) {
   }
 
   try {
-    console.log('🔄 Calling N8N webhook with data:', data);
+    console.log('🔄 Calling N8N webhook:', {
+      url: n8nWebhookUrl,
+      data: data,
+      language: language
+    });
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
     
     const response = await fetch(n8nWebhookUrl, {
       method: 'POST',
@@ -53,10 +66,20 @@ async function callN8NWebhook(data: any, language: string) {
         ...data,
         language: language
       }),
+      signal: controller.signal
     });
 
+    clearTimeout(timeoutId);
+
+    console.log('📡 N8N webhook response status:', response.status);
+
     if (!response.ok) {
-      console.error('❌ N8N webhook failed:', response.status, response.statusText);
+      const errorText = await response.text();
+      console.error('❌ N8N webhook failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText
+      });
       return null;
     }
 
@@ -64,41 +87,71 @@ async function callN8NWebhook(data: any, language: string) {
     console.log('✅ N8N webhook response received:', result);
     return result;
   } catch (error) {
-    console.error('❌ N8N webhook error:', error);
+    if (error.name === 'AbortError') {
+      console.error('❌ N8N webhook timeout after 30 seconds');
+    } else {
+      console.error('❌ N8N webhook error:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+    }
     return null;
   }
 }
 
-// Process N8N calls in AI response
+// Enhanced N8N call processing with improved regex and logging
 async function processN8NCalls(aiResponse: string, language: string): Promise<string> {
-  const n8nPattern = /\[N8N_CALL:({[^}]+})\]/g;
+  // Improved regex to handle nested JSON properly
+  const n8nPattern = /\[N8N_CALL:(\{.*?\})\]/g;
   let processedResponse = aiResponse;
   let match;
+  let callCount = 0;
+
+  console.log('🔍 Checking for N8N calls in AI response...');
+  console.log('📄 AI response length:', aiResponse.length);
+  
+  // Check if there are any N8N calls
+  const hasN8NCalls = n8nPattern.test(aiResponse);
+  console.log('🎯 N8N calls detected:', hasN8NCalls);
+  
+  // Reset regex to process matches
+  n8nPattern.lastIndex = 0;
 
   while ((match = n8nPattern.exec(aiResponse)) !== null) {
+    callCount++;
+    console.log(`🔧 Processing N8N call #${callCount}:`, {
+      fullMatch: match[0],
+      jsonPart: match[1]
+    });
+    
     try {
       const n8nData = JSON.parse(match[1]);
-      console.log('🔧 Processing N8N call:', n8nData);
+      console.log('✅ Successfully parsed N8N JSON:', n8nData);
       
       const n8nResult = await callN8NWebhook(n8nData, language);
       
       if (n8nResult && n8nResult.data) {
         // Replace N8N command with actual result
-        const resultText = `\n\n**Legal Research Results:**\n${n8nResult.data}\n\n`;
+        const resultText = `\n\n**Результаты правового поиска:**\n${n8nResult.data}\n\n`;
         processedResponse = processedResponse.replace(match[0], resultText);
-        console.log('✅ N8N call processed successfully');
+        console.log('✅ N8N call processed successfully, result integrated');
       } else {
         // Remove N8N command if no result
-        processedResponse = processedResponse.replace(match[0], '');
-        console.log('⚠️ N8N call returned no data');
+        processedResponse = processedResponse.replace(match[0], '\n\n*Поиск судебной практики временно недоступен. Информация предоставлена на основе общих знаний.*\n\n');
+        console.log('⚠️ N8N call returned no data, showing fallback message');
       }
-    } catch (error) {
-      console.error('❌ Error processing N8N call:', error);
-      // Remove failed N8N command
-      processedResponse = processedResponse.replace(match[0], '');
+    } catch (parseError) {
+      console.error('❌ Error parsing N8N JSON:', {
+        error: parseError.message,
+        jsonString: match[1]
+      });
+      // Remove failed N8N command and show error message
+      processedResponse = processedResponse.replace(match[0], '\n\n*Ошибка при обращении к базе судебной практики. Информация предоставлена на основе общих знаний.*\n\n');
     }
   }
 
+  console.log(`📊 N8N processing complete: ${callCount} calls processed`);
   return processedResponse;
 }
 
@@ -360,7 +413,7 @@ Als je denkt dat de vraag van de gebruiker toegang tot rechterlijke uitspraken, 
 
 Vraag de gebruiker niet om deze zoekopdracht te starten. Beslis zelf wanneer het relevant is en integreer het resultaat natuurlijk in je antwoord.`,
 
-      ru: `Вы - AI-помощник, специализирующийся на голландском праве. Вы предоставляете пользователям высококачественные юридические резюме ("juridische informatie") в ответ на их вопросы.
+      ru: `Вы - AI-помощник, специализирующийся на голландском праве. Вы предоставляете пользователям высококачественные юридические резюме ("juridische информацию") в ответ на их вопросы.
 
 Ваша цель - дать четкие, точные и практические юридические рекомендации на основе голландского права и судебной практики. Вы не просто даете общие советы — ваш ответ должен включать:
 
@@ -667,6 +720,8 @@ No le pidas al usuario que inicie esta búsqueda. Decide por ti mismo cuándo es
     if (aiResponse.includes('[N8N_CALL:')) {
       console.log('🔧 N8N calls detected, processing...');
       processedResponse = await processN8NCalls(aiResponse, language);
+    } else {
+      console.log('📄 No N8N calls detected in AI response');
     }
 
     // Add AI response to messages
