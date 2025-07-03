@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -248,8 +249,8 @@ export const Chat: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 h-[calc(100vh-8rem)]">
-      <div className="flex gap-4 h-full">
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex gap-4 h-[calc(100vh-12rem)]">
         {/* Chat History Sidebar */}
         <div className="w-1/4 min-w-[250px]">
           <Card className="h-full">
@@ -287,7 +288,7 @@ export const Chat: React.FC = () => {
         {/* Main Chat Area */}
         <div className="flex-1">
           <Card className="h-full flex flex-col">
-            <CardHeader>
+            <CardHeader className="flex-shrink-0">
               <div className="flex items-center justify-between">
                 <CardTitle>{currentChat ? currentChat.title : t.chat}</CardTitle>
                 <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -297,48 +298,50 @@ export const Chat: React.FC = () => {
               </div>
             </CardHeader>
             
-            <CardContent className="flex-1 flex flex-col p-0">
+            <CardContent className="flex-1 flex flex-col p-0 min-h-0">
               {/* Messages Area */}
-              <ScrollArea className="flex-1 p-4">
-                {currentChat?.messages.length ? (
-                  <div className="space-y-4">
-                    {currentChat.messages.map((msg, index) => (
-                      <div
-                        key={index}
-                        className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                      >
+              <div className="flex-1 min-h-0">
+                <ScrollArea className="h-full p-4">
+                  {currentChat?.messages.length ? (
+                    <div className="space-y-4">
+                      {currentChat.messages.map((msg, index) => (
                         <div
-                          className={`max-w-[80%] p-3 rounded-lg ${
-                            msg.role === 'user'
-                              ? 'bg-[#FF6600] text-white'
-                              : 'bg-gray-100 text-gray-900'
-                          }`}
+                          key={index}
+                          className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
-                          <div className="whitespace-pre-wrap">{msg.content}</div>
-                          <div className="text-xs opacity-70 mt-1">
-                            {new Date(msg.timestamp).toLocaleTimeString()}
+                          <div
+                            className={`max-w-[80%] p-3 rounded-lg ${
+                              msg.role === 'user'
+                                ? 'bg-[#FF6600] text-white'
+                                : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100'
+                            }`}
+                          >
+                            <div className="whitespace-pre-wrap">{msg.content}</div>
+                            <div className="text-xs opacity-70 mt-1">
+                              {new Date(msg.timestamp).toLocaleTimeString()}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                    <div ref={messagesEndRef} />
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center h-full text-gray-500">
-                    <div className="text-center">
-                      <p className="text-lg mb-2">{t.getHelp}</p>
-                      <p className="text-sm">{t.description}</p>
-                      <div className="flex items-center justify-center gap-2 mt-4 text-xs">
-                        <Globe className="h-3 w-3" />
-                        <span>Language: {language.toUpperCase()}</span>
+                      ))}
+                      <div ref={messagesEndRef} />
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
+                      <div className="text-center">
+                        <p className="text-lg mb-2">{t.getHelp}</p>
+                        <p className="text-sm">{t.description}</p>
+                        <div className="flex items-center justify-center gap-2 mt-4 text-xs">
+                          <Globe className="h-3 w-3" />
+                          <span>Language: {language.toUpperCase()}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-              </ScrollArea>
+                  )}
+                </ScrollArea>
+              </div>
 
               {/* Message Input */}
-              <div className="border-t p-4">
+              <div className="border-t p-4 flex-shrink-0">
                 <form onSubmit={handleSendMessage} className="flex gap-2">
                   <Input
                     value={message}

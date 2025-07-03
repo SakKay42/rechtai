@@ -25,9 +25,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const isActive = (path: string) => location.pathname === path;
 
   const getUserDisplayName = () => {
-    if (profile?.first_name && profile?.last_name) {
-      return `${profile.first_name} ${profile.last_name}`;
-    }
     if (profile?.first_name) {
       return profile.first_name;
     }
@@ -60,13 +57,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     {t.chat}
                   </Button>
                   <Button
-                    variant={isActive('/account') ? 'default' : 'ghost'}
-                    onClick={() => navigate('/account')}
-                    className={isActive('/account') ? 'bg-[#FF6600] hover:bg-[#FF6600]/90' : ''}
-                  >
-                    {t.account}
-                  </Button>
-                  <Button
                     variant={isActive('/pricing') ? 'default' : 'ghost'}
                     onClick={() => navigate('/pricing')}
                     className={isActive('/pricing') ? 'bg-[#FF6600] hover:bg-[#FF6600]/90' : ''}
@@ -92,7 +82,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               
               {user ? (
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                  <span 
+                    className="text-sm text-gray-600 dark:text-gray-300 cursor-pointer hover:text-[#FF6600] dark:hover:text-[#FF6600] transition-colors"
+                    onClick={() => navigate('/account')}
+                  >
                     {getUserDisplayName()}
                   </span>
                   <Button variant="outline" onClick={handleSignOut}>
