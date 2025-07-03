@@ -27,9 +27,6 @@ export const Home: React.FC = () => {
         <h1 className="text-5xl font-bold text-black mb-6">
           {t.title}
         </h1>
-        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-          {t.subtitle}
-        </p>
         <p className="text-lg text-gray-500 mb-8 max-w-3xl mx-auto">
           {t.description}
         </p>
@@ -51,7 +48,7 @@ export const Home: React.FC = () => {
             <div className="w-12 h-12 bg-[#FF6600]/10 rounded-2xl flex items-center justify-center mb-4">
               <Globe className="h-6 w-6 text-[#FF6600]" />
             </div>
-            <CardTitle className="text-xl font-bold">6 {t.languages || 'Languages'}</CardTitle>
+            <CardTitle className="text-xl font-bold">6 {t.languages}</CardTitle>
           </CardHeader>
           <CardContent>
             <CardDescription className="text-gray-600">

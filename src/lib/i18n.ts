@@ -1,7 +1,7 @@
 
 export const translations = {
   en: {
-    title: 'Legal Assistant',
+    title: 'RechtAI',
     subtitle: 'AI-powered legal information',
     description: 'Get professional legal information quickly and clearly',
     getHelp: 'Get Legal Help',
@@ -33,10 +33,19 @@ export const translations = {
     failedToSendMessage: 'Failed to send message',
     error: 'Error',
     chatLimitReached: 'Chat limit reached',
-    upgradeForUnlimited: 'Upgrade to Premium for unlimited chats'
+    upgradeForUnlimited: 'Upgrade to Premium for unlimited chats',
+    signUpHere: 'Sign up here',
+    signInHere: 'Sign in here',
+    languages: 'Languages',
+    pdfExport: 'PDF Export',
+    free: 'Free',
+    premium: 'Premium',
+    unlimited: 'Unlimited',
+    chatsPerMonth: 'chats per month',
+    documentGeneration: 'Document Generation'
   },
   nl: {
-    title: 'Juridische Assistent',
+    title: 'RechtAI',
     subtitle: 'AI-assistent voor juridische informatie',
     description: 'Krijg snel en duidelijk professionele juridische informatie',
     getHelp: 'Krijg Juridische Hulp',
@@ -68,10 +77,19 @@ export const translations = {
     failedToSendMessage: 'Verzenden van bericht mislukt',
     error: 'Fout',
     chatLimitReached: 'Chat limiet bereikt',
-    upgradeForUnlimited: 'Upgrade naar Premium voor onbeperkte chats'
+    upgradeForUnlimited: 'Upgrade naar Premium voor onbeperkte chats',
+    signUpHere: 'Hier registreren',
+    signInHere: 'Hier inloggen',
+    languages: 'Talen',
+    pdfExport: 'PDF Export',
+    free: 'Gratis',
+    premium: 'Premium',
+    unlimited: 'Onbeperkt',
+    chatsPerMonth: 'chats per maand',
+    documentGeneration: 'Document Generatie'
   },
   ru: {
-    title: 'Юридический Помощник',
+    title: 'RechtAI',
     subtitle: 'AI-помощник для правовых справок',
     description: 'Получите профессиональные юридические справки быстро и понятно',
     getHelp: 'Получить Правовую Помощь',
@@ -103,10 +121,19 @@ export const translations = {
     failedToSendMessage: 'Не удалось отправить сообщение',
     error: 'Ошибка',
     chatLimitReached: 'Лимит чатов достигнут',
-    upgradeForUnlimited: 'Обновитесь до Premium для неограниченных чатов'
+    upgradeForUnlimited: 'Обновитесь до Premium для неограниченных чатов',
+    signUpHere: 'Зарегистрируйтесь здесь',
+    signInHere: 'Войдите здесь',
+    languages: 'Языки',
+    pdfExport: 'Экспорт PDF',
+    free: 'Бесплатно',
+    premium: 'Премиум',
+    unlimited: 'Неограниченно',
+    chatsPerMonth: 'чатов в месяц',
+    documentGeneration: 'Генерация документов'
   },
   fr: {
-    title: 'Assistant Juridique',
+    title: 'RechtAI',
     subtitle: 'Assistant IA pour informations juridiques',
     description: 'Obtenez des informations juridiques professionnelles rapidement et clairement',
     getHelp: 'Obtenir de l\'Aide Juridique',
@@ -138,10 +165,19 @@ export const translations = {
     failedToSendMessage: 'Échec de l\'envoi du message',
     error: 'Erreur',
     chatLimitReached: 'Limite de chat atteinte',
-    upgradeForUnlimited: 'Passez à Premium pour des chats illimités'
+    upgradeForUnlimited: 'Passez à Premium pour des chats illimités',
+    signUpHere: 'S\'inscrire ici',
+    signInHere: 'Se connecter ici',
+    languages: 'Langues',
+    pdfExport: 'Export PDF',
+    free: 'Gratuit',
+    premium: 'Premium',
+    unlimited: 'Illimité',
+    chatsPerMonth: 'chats par mois',
+    documentGeneration: 'Génération de documents'
   },
   es: {
-    title: 'Asistente Legal',
+    title: 'RechtAI',
     subtitle: 'Asistente de IA para información legal',
     description: 'Obtén información legal profesional de forma rápida y clara',
     getHelp: 'Obtener Ayuda Legal',
@@ -173,10 +209,19 @@ export const translations = {
     failedToSendMessage: 'Error al enviar mensaje',
     error: 'Error',
     chatLimitReached: 'Límite de chat alcanzado',
-    upgradeForUnlimited: 'Actualiza a Premium para chats ilimitados'
+    upgradeForUnlimited: 'Actualiza a Premium para chats ilimitados',
+    signUpHere: 'Regístrate aquí',
+    signInHere: 'Inicia sesión aquí',
+    languages: 'Idiomas',
+    pdfExport: 'Exportar PDF',
+    free: 'Gratis',
+    premium: 'Premium',
+    unlimited: 'Ilimitado',
+    chatsPerMonth: 'chats por mes',
+    documentGeneration: 'Generación de documentos'
   },
   ar: {
-    title: 'المساعد القانوني',
+    title: 'RechtAI',
     subtitle: 'مساعد ذكي للمعلومات القانونية',
     description: 'احصل على معلومات قانونية مهنية بسرعة ووضوح',
     getHelp: 'احصل على المساعدة القانونية',
@@ -208,7 +253,16 @@ export const translations = {
     failedToSendMessage: 'فشل في إرسال الرسالة',
     error: 'خطأ',
     chatLimitReached: 'تم الوصول إلى حد المحادثة',
-    upgradeForUnlimited: 'ترقية إلى Premium للمحادثات غير المحدودة'
+    upgradeForUnlimited: 'ترقية إلى Premium للمحادثات غير المحدودة',
+    signUpHere: 'سجل هنا',
+    signInHere: 'ادخل هنا',
+    languages: 'اللغات',
+    pdfExport: 'تصدير PDF',
+    free: 'مجاني',
+    premium: 'بريميوم',
+    unlimited: 'غير محدود',
+    chatsPerMonth: 'محادثات في الشهر',
+    documentGeneration: 'توليد الوثائق'
   }
 };
 
