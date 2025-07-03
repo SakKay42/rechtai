@@ -214,3 +214,9 @@ export const translations = {
 
 export type Language = keyof typeof translations;
 export type TranslationKey = keyof typeof translations.en;
+
+export const languages: Language[] = ['nl', 'en', 'ar', 'es', 'ru', 'fr'];
+
+export const useTranslations = (language: Language) => {
+  return translations[language];
+};
