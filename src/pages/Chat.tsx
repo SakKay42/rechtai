@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,6 +35,7 @@ export const Chat: React.FC = () => {
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const { toast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
   
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -49,11 +51,26 @@ export const Chat: React.FC = () => {
     scrollToBottom();
   }, [currentChat?.messages]);
 
+  // Load chat history when user is available
   useEffect(() => {
     if (user) {
       loadChatHistory();
     }
   }, [user]);
+
+  // Handle URL parameter for specific chat loading
+  useEffect(() => {
+    const chatId = searchParams.get('id');
+    if (chatId && chatHistory.length > 0) {
+      const existingChat = chatHistory.find(chat => chat.id === chatId);
+      if (existingChat) {
+        setCurrentChat(existingChat);
+      } else {
+        // Try to load the specific chat from database
+        loadSpecificChat(chatId);
+      }
+    }
+  }, [searchParams, chatHistory]);
 
   const loadChatHistory = async () => {
     try {
@@ -77,6 +94,43 @@ export const Chat: React.FC = () => {
       setChatHistory(convertedHistory);
     } catch (error) {
       console.error('Error loading chat history:', error);
+    }
+  };
+
+  const loadSpecificChat = async (chatId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('chat_sessions')
+        .select('*')
+        .eq('id', chatId)
+        .eq('user_id', user?.id)
+        .single();
+
+      if (error) throw error;
+      
+      if (data) {
+        const specificChat: ChatSession = {
+          id: data.id,
+          title: data.title,
+          messages: Array.isArray(data.messages) ? data.messages : [],
+          created_at: data.created_at
+        };
+        
+        setCurrentChat(specificChat);
+        
+        // Add to history if not already there
+        setChatHistory(prev => {
+          const exists = prev.find(chat => chat.id === specificChat.id);
+          if (!exists) {
+            return [specificChat, ...prev];
+          }
+          return prev;
+        });
+      }
+    } catch (error) {
+      console.error('Error loading specific chat:', error);
+      // Clear the URL parameter if chat not found
+      setSearchParams({});
     }
   };
 
@@ -164,10 +218,16 @@ export const Chat: React.FC = () => {
 
       if (currentChat) {
         // Update existing chat
-        setCurrentChat({
+        const updatedChat = {
           ...currentChat,
           messages: [...currentChat.messages, newUserMessage, aiMessage]
-        });
+        };
+        setCurrentChat(updatedChat);
+        
+        // Update history
+        setChatHistory(prev => prev.map(chat => 
+          chat.id === updatedChat.id ? updatedChat : chat
+        ));
       } else {
         // Create new chat session
         const newChat: ChatSession = {
@@ -178,6 +238,9 @@ export const Chat: React.FC = () => {
         };
         setCurrentChat(newChat);
         setChatHistory(prev => [newChat, ...prev]);
+        
+        // Update URL with new chat ID
+        setSearchParams({ id: newChat.id });
       }
 
       toast({
@@ -229,10 +292,12 @@ export const Chat: React.FC = () => {
 
   const startNewChat = () => {
     setCurrentChat(null);
+    setSearchParams({});
   };
 
   const selectChat = (chat: ChatSession) => {
     setCurrentChat(chat);
+    setSearchParams({ id: chat.id });
   };
 
   if (!user) {
