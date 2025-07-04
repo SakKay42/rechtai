@@ -32,7 +32,7 @@ export const Documents: React.FC = () => {
           <CardContent className="text-center py-12">
             <AlertCircle className="h-16 w-16 text-[#FF6600] mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-4">Premium Feature</h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-muted-foreground mb-6">
               Document generation is available for Premium subscribers only.
             </p>
             <Button className="bg-[#FF6600] hover:bg-[#FF6600]/90">
@@ -47,10 +47,10 @@ export const Documents: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-black mb-2">
+        <h1 className="text-3xl font-bold text-foreground mb-2">
           {t.documents}
         </h1>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           Generate legal documents based on your chat conversations
         </p>
       </div>
@@ -70,7 +70,7 @@ export const Documents: React.FC = () => {
               <CardTitle>{docType.title}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 mb-4">
+              <p className="text-muted-foreground mb-4">
                 Generate a {docType.title.toLowerCase()} based on your legal consultation.
               </p>
               <Button className="w-full bg-[#FF6600] hover:bg-[#FF6600]/90">

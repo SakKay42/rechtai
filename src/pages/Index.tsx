@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center space-y-8 animate-in fade-in duration-1000">
@@ -14,13 +14,13 @@ const Index = () => {
             <span className="text-sm font-medium">Добро пожаловать</span>
           </div>
           
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent leading-tight">
+          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-foreground via-blue-800 to-purple-800 bg-clip-text text-transparent leading-tight">
             Ваш новый проект
             <br />
             готов к запуску
           </h1>
           
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Начните создавать что-то удивительное с этим современным и гибким шаблоном
           </p>
           
@@ -29,7 +29,7 @@ const Index = () => {
               Начать работу
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-            <Button variant="outline" size="lg" className="border-gray-300 hover:border-gray-400 transition-colors">
+            <Button variant="outline" size="lg" className="border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
               Узнать больше
             </Button>
           </div>
@@ -42,8 +42,8 @@ const Index = () => {
               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-200">
                 <Zap className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900">Быстрый старт</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold text-foreground">Быстрый старт</h3>
+              <p className="text-muted-foreground">
                 Современные технологии и готовая к использованию структура проекта
               </p>
             </CardContent>
@@ -54,8 +54,8 @@ const Index = () => {
               <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-200">
                 <Heart className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900">Современный дизайн</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold text-foreground">Современный дизайн</h3>
+              <p className="text-muted-foreground">
                 Красивые компоненты и адаптивный интерфейс из коробки
               </p>
             </CardContent>
@@ -66,8 +66,8 @@ const Index = () => {
               <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-200">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900">Готов к масштабированию</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold text-foreground">Готов к масштабированию</h3>
+              <p className="text-muted-foreground">
                 Архитектура проекта позволяет легко добавлять новые функции
               </p>
             </CardContent>

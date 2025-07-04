@@ -41,10 +41,10 @@ export const Pricing: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-black mb-4">
+        <h1 className="text-4xl font-bold text-foreground mb-4">
           {t.pricing}
         </h1>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
           Choose the plan that works best for you
         </p>
       </div>
@@ -53,7 +53,7 @@ export const Pricing: React.FC = () => {
         {plans.map((plan, index) => (
           <Card 
             key={index} 
-            className={`relative border-2 ${plan.popular ? 'border-[#FF6600] shadow-lg' : 'border-gray-200'}`}
+            className={`relative border-2 ${plan.popular ? 'border-[#FF6600] shadow-lg' : 'border-gray-200 dark:border-gray-700'}`}
           >
             {plan.popular && (
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
@@ -68,10 +68,10 @@ export const Pricing: React.FC = () => {
                 {plan.name}
               </CardTitle>
               <div className="mt-4">
-                <span className="text-4xl font-bold text-black">
+                <span className="text-4xl font-bold text-foreground">
                   {plan.price}
                 </span>
-                <span className="text-gray-600">
+                <span className="text-muted-foreground">
                   {plan.period}
                 </span>
               </div>
@@ -82,7 +82,7 @@ export const Pricing: React.FC = () => {
                 {plan.features.map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-center">
                     <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                    <span className="text-gray-700">{feature}</span>
+                    <span className="text-foreground">{feature}</span>
                   </li>
                 ))}
               </ul>
