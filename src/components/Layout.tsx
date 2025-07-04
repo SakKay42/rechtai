@@ -7,7 +7,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { DoorClosed, Earth, Menu, X, MessageCircle, CreditCard, FileText } from 'lucide-react';
+import { DoorClosed, Menu, X, MessageCircle, CreditCard, FileText } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -15,7 +15,7 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user, profile, signOut } = useAuth();
-  const { t, language, setLanguage } = useLanguage();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
@@ -44,15 +44,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     setMobileMenuOpen(false);
   };
 
-  const languages = [
-    { code: 'nl', name: 'Nederlands' },
-    { code: 'en', name: 'English' },
-    { code: 'ar', name: 'العربية' },
-    { code: 'es', name: 'Español' },
-    { code: 'ru', name: 'Русский' },
-    { code: 'fr', name: 'Français' }
-  ];
-
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 touch-manipulation">
@@ -68,8 +59,18 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               </h1>
               
               {user ? (
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1">
                   <ThemeToggle />
+                  <LanguageSelector />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleSignOut}
+                    className="h-9 w-9 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    aria-label="Logout"
+                  >
+                    <DoorClosed className="h-5 w-5 text-red-600" />
+                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -80,8 +81,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1">
                   <ThemeToggle />
+                  <LanguageSelector />
                   <Button variant="outline" size="sm" onClick={() => handleNavigation('/auth')}>
                     {t.login}
                   </Button>
@@ -167,7 +169,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           {isMobile && mobileMenuOpen && user && (
             <div className="mt-4 pb-4 border-t dark:border-gray-700">
               <div className="flex flex-col space-y-3 pt-4">
-                {/* Navigation */}
                 <Button
                   variant={isActive('/chat') ? 'default' : 'ghost'}
                   onClick={() => handleNavigation('/chat')}
@@ -195,25 +196,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   {t.documents}
                 </Button>
 
-                {/* Language Selector Mobile */}
-                <div className="flex items-center justify-between py-2">
-                  <div className="flex items-center">
-                    <Earth className="h-5 w-5 mr-3" />
-                    <span className="text-sm font-medium">Language</span>
-                  </div>
-                  <select
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value as any)}
-                    className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm"
-                  >
-                    {languages.map((lang) => (
-                      <option key={lang.code} value={lang.code}>
-                        {lang.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
                 {/* User Info */}
                 <div className="flex items-center justify-between py-2 border-t dark:border-gray-700 pt-4">
                   <span 
@@ -222,10 +204,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   >
                     {getUserDisplayName()}
                   </span>
-                  <Button variant="outline" size="sm" onClick={handleSignOut}>
-                    <DoorClosed className="h-4 w-4 mr-2" />
-                    {t.logout}
-                  </Button>
                 </div>
               </div>
             </div>

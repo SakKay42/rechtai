@@ -2,13 +2,15 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Send, Loader2, Globe } from 'lucide-react';
+import { Send, Loader2, Globe, History, Plus } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -26,7 +28,7 @@ interface ChatSession {
 interface ChatHistoryItem {
   id: string;
   title: string;
-  messages: any; // Json type from Supabase
+  messages: any;
   created_at: string;
   updated_at: string;
 }
@@ -35,12 +37,14 @@ export const Chat: React.FC = () => {
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [searchParams, setSearchParams] = useSearchParams();
   
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [currentChat, setCurrentChat] = useState<ChatSession | null>(null);
   const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -134,6 +138,18 @@ export const Chat: React.FC = () => {
     }
   };
 
+  const startNewChat = () => {
+    setCurrentChat(null);
+    setSearchParams({});
+    setIsHistoryOpen(false);
+  };
+
+  const selectChat = (chat: ChatSession) => {
+    setCurrentChat(chat);
+    setSearchParams({ id: chat.id });
+    setIsHistoryOpen(false);
+  };
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -143,7 +159,6 @@ export const Chat: React.FC = () => {
     setMessage('');
     setIsLoading(true);
 
-    // Enhanced debugging - log request details
     console.log('🌍 Sending message with language:', language);
     console.log('🔧 Request details:', {
       message: userMessage,
@@ -153,7 +168,6 @@ export const Chat: React.FC = () => {
     });
 
     try {
-      // Add user message to current chat immediately for better UX
       const newUserMessage: Message = {
         role: 'user',
         content: userMessage,
@@ -177,7 +191,6 @@ export const Chat: React.FC = () => {
         }
       });
 
-      // Enhanced error logging
       if (error) {
         console.error('❌ Supabase function error:', {
           error,
@@ -209,7 +222,6 @@ export const Chat: React.FC = () => {
         throw new Error('No response received from AI service');
       }
 
-      // Update current chat with AI response
       const aiMessage: Message = {
         role: 'assistant',
         content: data.response,
@@ -217,19 +229,16 @@ export const Chat: React.FC = () => {
       };
 
       if (currentChat) {
-        // Update existing chat
         const updatedChat = {
           ...currentChat,
           messages: [...currentChat.messages, newUserMessage, aiMessage]
         };
         setCurrentChat(updatedChat);
         
-        // Update history
         setChatHistory(prev => prev.map(chat => 
           chat.id === updatedChat.id ? updatedChat : chat
         ));
       } else {
-        // Create new chat session
         const newChat: ChatSession = {
           id: data.chatId,
           title: userMessage.length > 50 ? userMessage.substring(0, 50) + '...' : userMessage,
@@ -239,7 +248,6 @@ export const Chat: React.FC = () => {
         setCurrentChat(newChat);
         setChatHistory(prev => [newChat, ...prev]);
         
-        // Update URL with new chat ID
         setSearchParams({ id: newChat.id });
       }
 
@@ -257,7 +265,6 @@ export const Chat: React.FC = () => {
         cause: error.cause
       });
 
-      // Enhanced error messages for users
       let errorMessage = t.failedToSendMessage || 'Failed to send message';
       let errorTitle = t.error || 'Error';
 
@@ -278,26 +285,15 @@ export const Chat: React.FC = () => {
         variant: 'destructive'
       });
 
-      // Revert optimistic UI update
       if (currentChat) {
         setCurrentChat({
           ...currentChat,
-          messages: currentChat.messages.slice(0, -1) // Remove the optimistically added message
+          messages: currentChat.messages.slice(0, -1)
         });
       }
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const startNewChat = () => {
-    setCurrentChat(null);
-    setSearchParams({});
-  };
-
-  const selectChat = (chat: ChatSession) => {
-    setCurrentChat(chat);
-    setSearchParams({ id: chat.id });
   };
 
   if (!user) {
@@ -315,60 +311,12 @@ export const Chat: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8 overflow-hidden">
       <div className="flex gap-4 h-[80vh] overflow-hidden">
-        {/* Chat History Sidebar */}
-        <div className="w-1/4 min-w-[250px] hidden md:block">
-          <Card className="h-full dark:bg-gray-800 dark:border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-sm dark:text-gray-100">{t.history}</CardTitle>
-              <Button 
-                onClick={startNewChat}
-                size="sm"
-                className="w-full bg-[#FF6600] hover:bg-[#FF6600]/90"
-              >
-                {t.startChat}
-              </Button>
-            </CardHeader>
-            <CardContent className="p-0">
-              <ScrollArea className="h-[calc(100%-8rem)]">
-                <div className="p-4 space-y-2">
-                  {chatHistory.map((chat) => (
-                    <Button
-                      key={chat.id}
-                      variant={currentChat?.id === chat.id ? "default" : "ghost"}
-                      className={`w-full justify-start text-left h-auto p-3 whitespace-normal ${
-                        currentChat?.id === chat.id 
-                          ? 'bg-[#FF6600] hover:bg-[#FF6600]/90 text-white' 
-                          : 'dark:text-gray-100 dark:hover:bg-gray-700'
-                      }`}
-                      onClick={() => selectChat(chat)}
-                    >
-                      <div className="truncate text-sm">
-                        {chat.title}
-                      </div>
-                    </Button>
-                  ))}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Chat Area */}
-        <div className="flex-1 md:flex-1 w-full">
-          <Card className="h-full flex flex-col dark:bg-gray-800 dark:border-gray-700">
-            <CardHeader className="flex-shrink-0">
-              <div className="flex items-center justify-between">
-                <CardTitle className="dark:text-gray-100 text-sm md:text-base">
-                  {currentChat ? currentChat.title : t.chat}
-                </CardTitle>
-                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                  <Globe className="h-4 w-4" />
-                  <span className="hidden sm:inline">{language.toUpperCase()}</span>
-                </div>
-              </div>
-              
-              {/* Mobile New Chat Button */}
-              <div className="md:hidden">
+        {/* Desktop Chat History Sidebar */}
+        {!isMobile && (
+          <div className="w-1/4 min-w-[250px]">
+            <Card className="h-full dark:bg-gray-800 dark:border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-sm dark:text-gray-100">{t.history}</CardTitle>
                 <Button 
                   onClick={startNewChat}
                   size="sm"
@@ -376,7 +324,107 @@ export const Chat: React.FC = () => {
                 >
                   {t.startChat}
                 </Button>
+              </CardHeader>
+              <CardContent className="p-0">
+                <ScrollArea className="h-[calc(100%-8rem)]">
+                  <div className="p-4 space-y-2">
+                    {chatHistory.map((chat) => (
+                      <Button
+                        key={chat.id}
+                        variant={currentChat?.id === chat.id ? "default" : "ghost"}
+                        className={`w-full justify-start text-left h-auto p-3 whitespace-normal ${
+                          currentChat?.id === chat.id 
+                            ? 'bg-[#FF6600] hover:bg-[#FF6600]/90 text-white' 
+                            : 'dark:text-gray-100 dark:hover:bg-gray-700'
+                        }`}
+                        onClick={() => selectChat(chat)}
+                      >
+                        <div className="truncate text-sm">
+                          {chat.title}
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Main Chat Area */}
+        <div className="flex-1 w-full">
+          <Card className="h-full flex flex-col dark:bg-gray-800 dark:border-gray-700">
+            <CardHeader className="flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CardTitle className="dark:text-gray-100 text-sm md:text-base">
+                    {currentChat ? currentChat.title : t.chat}
+                  </CardTitle>
+                  
+                  {/* Mobile History Button */}
+                  {isMobile && (
+                    <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
+                      <SheetTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <History className="h-4 w-4" />
+                        </Button>
+                      </SheetTrigger>
+                      <SheetContent side="left" className="w-[280px]">
+                        <SheetHeader>
+                          <SheetTitle>{t.history || 'Chat History'}</SheetTitle>
+                        </SheetHeader>
+                        <div className="mt-4 space-y-2">
+                          <Button 
+                            onClick={startNewChat}
+                            size="sm"
+                            className="w-full bg-[#FF6600] hover:bg-[#FF6600]/90"
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            {t.startChat}
+                          </Button>
+                          <ScrollArea className="h-[calc(100vh-12rem)]">
+                            <div className="space-y-2">
+                              {chatHistory.map((chat) => (
+                                <Button
+                                  key={chat.id}
+                                  variant={currentChat?.id === chat.id ? "default" : "ghost"}
+                                  className={`w-full justify-start text-left h-auto p-3 whitespace-normal ${
+                                    currentChat?.id === chat.id 
+                                      ? 'bg-[#FF6600] hover:bg-[#FF6600]/90 text-white' 
+                                      : 'dark:text-gray-100 dark:hover:bg-gray-700'
+                                  }`}
+                                  onClick={() => selectChat(chat)}
+                                >
+                                  <div className="truncate text-sm">
+                                    {chat.title}
+                                  </div>
+                                </Button>
+                              ))}
+                            </div>
+                          </ScrollArea>
+                        </div>
+                      </SheetContent>
+                    </Sheet>
+                  )}
+                </div>
+                
+                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                  <Globe className="h-4 w-4" />
+                  <span className="hidden sm:inline">{language.toUpperCase()}</span>
+                </div>
               </div>
+              
+              {/* Mobile New Chat Button */}
+              {isMobile && (
+                <Button 
+                  onClick={startNewChat}
+                  size="sm"
+                  className="w-full bg-[#FF6600] hover:bg-[#FF6600]/90"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t.startChat}
+                </Button>
+              )}
             </CardHeader>
             
             <CardContent className="flex-1 flex flex-col p-0 min-h-0">
