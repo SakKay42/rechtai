@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -84,11 +83,11 @@ export const Chat: React.FC = () => {
 
       if (error) throw error;
       
-      // Convert Supabase data to our ChatSession format
+      // Convert Supabase data to our ChatSession format with proper type conversion
       const convertedHistory: ChatSession[] = (data || []).map((item: ChatHistoryItem) => ({
         id: item.id,
         title: item.title,
-        messages: Array.isArray(item.messages) ? item.messages as Message[] : [],
+        messages: Array.isArray(item.messages) ? (item.messages as unknown as Message[]) : [],
         created_at: item.created_at
       }));
       
@@ -113,7 +112,7 @@ export const Chat: React.FC = () => {
         const specificChat: ChatSession = {
           id: data.id,
           title: data.title,
-          messages: Array.isArray(data.messages) ? data.messages as Message[] : [],
+          messages: Array.isArray(data.messages) ? (data.messages as unknown as Message[]) : [],
           created_at: data.created_at
         };
         
@@ -317,7 +316,7 @@ export const Chat: React.FC = () => {
     <div className="container mx-auto px-4 py-8 overflow-hidden">
       <div className="flex gap-4 h-[80vh] overflow-hidden">
         {/* Chat History Sidebar */}
-        <div className="w-1/4 min-w-[250px]">
+        <div className="w-1/4 min-w-[250px] hidden md:block">
           <Card className="h-full dark:bg-gray-800 dark:border-gray-700">
             <CardHeader>
               <CardTitle className="text-sm dark:text-gray-100">{t.history}</CardTitle>
@@ -355,15 +354,28 @@ export const Chat: React.FC = () => {
         </div>
 
         {/* Main Chat Area */}
-        <div className="flex-1">
+        <div className="flex-1 md:flex-1 w-full">
           <Card className="h-full flex flex-col dark:bg-gray-800 dark:border-gray-700">
             <CardHeader className="flex-shrink-0">
               <div className="flex items-center justify-between">
-                <CardTitle className="dark:text-gray-100">{currentChat ? currentChat.title : t.chat}</CardTitle>
+                <CardTitle className="dark:text-gray-100 text-sm md:text-base">
+                  {currentChat ? currentChat.title : t.chat}
+                </CardTitle>
                 <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                   <Globe className="h-4 w-4" />
-                  <span>{language.toUpperCase()}</span>
+                  <span className="hidden sm:inline">{language.toUpperCase()}</span>
                 </div>
+              </div>
+              
+              {/* Mobile New Chat Button */}
+              <div className="md:hidden">
+                <Button 
+                  onClick={startNewChat}
+                  size="sm"
+                  className="w-full bg-[#FF6600] hover:bg-[#FF6600]/90"
+                >
+                  {t.startChat}
+                </Button>
               </div>
             </CardHeader>
             
@@ -379,13 +391,13 @@ export const Chat: React.FC = () => {
                           className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
                           <div
-                            className={`max-w-[80%] p-3 rounded-lg ${
+                            className={`max-w-[85%] md:max-w-[80%] p-3 rounded-lg ${
                               msg.role === 'user'
                                 ? 'bg-[#FF6600] text-white'
                                 : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
                             }`}
                           >
-                            <div className="whitespace-pre-wrap">{msg.content}</div>
+                            <div className="whitespace-pre-wrap text-sm md:text-base">{msg.content}</div>
                             <div className="text-xs opacity-70 mt-1">
                               {new Date(msg.timestamp).toLocaleTimeString()}
                             </div>
@@ -396,8 +408,8 @@ export const Chat: React.FC = () => {
                     </div>
                   ) : (
                     <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
-                      <div className="text-center">
-                        <p className="text-lg mb-2">{t.getHelp}</p>
+                      <div className="text-center px-4">
+                        <p className="text-base md:text-lg mb-2">{t.getHelp}</p>
                         <p className="text-sm">{t.description}</p>
                         <div className="flex items-center justify-center gap-2 mt-4 text-xs">
                           <Globe className="h-3 w-3" />
@@ -417,12 +429,12 @@ export const Chat: React.FC = () => {
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder={t.typeYourLegalQuestion || "Type your legal question..."}
                     disabled={isLoading}
-                    className="flex-1 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400"
+                    className="flex-1 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 text-sm md:text-base"
                   />
                   <Button
                     type="submit"
                     disabled={!message.trim() || isLoading}
-                    className="bg-[#FF6600] hover:bg-[#FF6600]/90"
+                    className="bg-[#FF6600] hover:bg-[#FF6600]/90 px-3 md:px-4"
                   >
                     {isLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
