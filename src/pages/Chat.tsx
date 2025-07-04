@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -87,7 +88,7 @@ export const Chat: React.FC = () => {
       const convertedHistory: ChatSession[] = (data || []).map((item: ChatHistoryItem) => ({
         id: item.id,
         title: item.title,
-        messages: Array.isArray(item.messages) ? item.messages : [],
+        messages: Array.isArray(item.messages) ? item.messages as Message[] : [],
         created_at: item.created_at
       }));
       
@@ -112,7 +113,7 @@ export const Chat: React.FC = () => {
         const specificChat: ChatSession = {
           id: data.id,
           title: data.title,
-          messages: Array.isArray(data.messages) ? data.messages : [],
+          messages: Array.isArray(data.messages) ? data.messages as Message[] : [],
           created_at: data.created_at
         };
         
