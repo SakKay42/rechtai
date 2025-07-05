@@ -23,7 +23,7 @@ export const useLanguage = () => {
 const getInitialLanguage = (): Language => {
   // Try to get from localStorage first
   const savedLanguage = localStorage.getItem('preferred_language');
-  if (savedLanguage && ['nl', 'en', 'ar', 'es', 'ru', 'fr'].includes(savedLanguage)) {
+  if (savedLanguage && ['nl', 'en', 'ar', 'es', 'ru', 'fr', 'pl', 'de'].includes(savedLanguage)) {
     return savedLanguage as Language;
   }
   
@@ -34,6 +34,8 @@ const getInitialLanguage = (): Language => {
   if (browserLang.startsWith('es')) return 'es';
   if (browserLang.startsWith('fr')) return 'fr';
   if (browserLang.startsWith('ar')) return 'ar';
+  if (browserLang.startsWith('pl')) return 'pl';
+  if (browserLang.startsWith('de')) return 'de';
   
   // Default to Dutch
   return 'nl';

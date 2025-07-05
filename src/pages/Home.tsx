@@ -48,11 +48,11 @@ export const Home: React.FC = () => {
             <div className="w-12 h-12 bg-[#FF6600]/10 rounded-2xl flex items-center justify-center mb-4">
               <Globe className="h-6 w-6 text-[#FF6600]" />
             </div>
-            <CardTitle className="text-xl font-bold text-foreground">6 {t.languages}</CardTitle>
+            <CardTitle className="text-xl font-bold text-foreground">{t.multilingual}</CardTitle>
           </CardHeader>
           <CardContent>
             <CardDescription className="text-muted-foreground">
-              Nederlands, English, العربية, Español, Русский, Français
+              Nederlands, English, العربية, Español, Русский, Français, Polski, Deutsch
             </CardDescription>
           </CardContent>
         </Card>

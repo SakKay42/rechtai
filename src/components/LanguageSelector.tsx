@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Earth } from 'lucide-react';
+import { Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -17,7 +17,9 @@ const languageNames: Record<Language, string> = {
   ar: 'العربية',
   es: 'Español',
   ru: 'Русский',
-  fr: 'Français'
+  fr: 'Français',
+  pl: 'Polski',
+  de: 'Deutsch'
 };
 
 export const LanguageSelector: React.FC = () => {
@@ -32,7 +34,7 @@ export const LanguageSelector: React.FC = () => {
           className="h-9 w-9 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           aria-label="Select language"
         >
-          <Earth className="h-5 w-5 text-blue-600" />
+          <Globe className="h-5 w-5 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-[120px]">

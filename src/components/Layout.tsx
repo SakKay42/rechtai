@@ -69,7 +69,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     className="h-9 w-9 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                     aria-label="Logout"
                   >
-                    <DoorClosed className="h-5 w-5 text-red-600" />
+                    <DoorClosed className="h-5 w-5 text-muted-foreground" />
                   </Button>
                   <Button
                     variant="ghost"
@@ -155,7 +155,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                       className="h-9 w-9"
                       aria-label="Logout"
                     >
-                      <DoorClosed className="h-4 w-4 text-red-600" />
+                      <DoorClosed className="h-4 w-4 text-muted-foreground" />
                     </Button>
                   </div>
                 ) : (
@@ -230,7 +230,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                       {getUserDisplayName()}
                     </span>
                     <Button variant="outline" onClick={handleSignOut}>
-                      <DoorClosed className="h-4 w-4 mr-2" />
+                      <DoorClosed className="h-4 w-4 mr-2 text-muted-foreground" />
                       {t.logout}
                     </Button>
                   </div>
