@@ -260,7 +260,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_language: "nl" | "en" | "ar" | "es" | "ru" | "fr"
+      app_language: "nl" | "en" | "ar" | "es" | "ru" | "fr" | "pl" | "de"
       chat_status: "active" | "completed" | "archived"
       document_status: "pending" | "generating" | "completed" | "failed"
       document_type: "complaint" | "lawsuit" | "letter" | "form"
@@ -380,7 +380,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_language: ["nl", "en", "ar", "es", "ru", "fr"],
+      app_language: ["nl", "en", "ar", "es", "ru", "fr", "pl", "de"],
       chat_status: ["active", "completed", "archived"],
       document_status: ["pending", "generating", "completed", "failed"],
       document_type: ["complaint", "lawsuit", "letter", "form"],
