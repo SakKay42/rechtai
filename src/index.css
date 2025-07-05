@@ -105,23 +105,60 @@ All colors MUST be HSL.
   }
 }
 
-/* Mobile optimizations */
+/* Mobile and Tablet optimizations */
 @layer utilities {
   .touch-manipulation {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
   }
   
-  /* Prevent double-tap zoom */
-  button, input, select, textarea {
+  /* Prevent double-tap zoom and improve touch experience */
+  button, input, select, textarea, [role="button"] {
     touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   
-  /* Improved touch targets for mobile */
-  @media (max-width: 768px) {
+  /* Improved touch targets for mobile and tablet */
+  @media (max-width: 1024px) {
     button {
       min-height: 44px;
       min-width: 44px;
+    }
+    
+    /* Prevent horizontal scroll */
+    body {
+      overflow-x: hidden;
+    }
+    
+    /* Better tablet breakpoints */
+    .container {
+      width: 100%;
+      max-width: 100%;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+  
+  /* Tablet specific styles */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+    
+    /* Compact navigation for tablets */
+    .tablet-compact {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+    }
+  }
+  
+  /* Prevent zoom on form inputs for iOS */
+  @media screen and (max-width: 1024px) {
+    input, select, textarea {
+      font-size: 16px !important;
     }
   }
 }

@@ -6,7 +6,7 @@ import { LanguageSelector } from '@/components/LanguageSelector';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useScreenSize } from '@/hooks/useScreenSize';
 import { DoorClosed, Menu, X, MessageCircle, CreditCard, FileText } from 'lucide-react';
 
 interface LayoutProps {
@@ -18,7 +18,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
-  const isMobile = useIsMobile();
+  const { isMobile, isTablet, isDesktop } = useScreenSize();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
@@ -45,14 +45,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div className="min-h-screen bg-white dark:bg-gray-900 touch-manipulation">
       <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 touch-manipulation">
         <div className="container mx-auto px-4 py-3 md:py-4">
           {/* Mobile Header */}
-          {isMobile ? (
+          {isMobile && (
             <div className="flex items-center justify-between">
               <h1 
-                className="text-xl font-bold text-black dark:text-white cursor-pointer" 
+                className="text-xl font-bold text-foreground cursor-pointer" 
                 onClick={() => handleNavigation('/')}
               >
                 {t.title}
@@ -90,12 +90,98 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </div>
               )}
             </div>
-          ) : (
-            /* Desktop Header */
+          )}
+
+          {/* Tablet Header */}
+          {isTablet && (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-6">
+                <h1 
+                  className="text-xl font-bold text-foreground cursor-pointer" 
+                  onClick={() => navigate('/')}
+                >
+                  {t.title}
+                </h1>
+                
+                {user && (
+                  <nav className="flex items-center space-x-4">
+                    <Button
+                      variant={isActive('/chat') ? 'default' : 'ghost'}
+                      onClick={() => navigate('/chat')}
+                      className={`${isActive('/chat') ? 'bg-[#FF6600] hover:bg-[#FF6600]/90' : ''} px-3`}
+                      size="sm"
+                    >
+                      <MessageCircle className="h-4 w-4 mr-1" />
+                      {t.chat}
+                    </Button>
+                    <Button
+                      variant={isActive('/pricing') ? 'default' : 'ghost'}
+                      onClick={() => navigate('/pricing')}
+                      className={`${isActive('/pricing') ? 'bg-[#FF6600] hover:bg-[#FF6600]/90' : ''} px-3`}
+                      size="sm"
+                    >
+                      <CreditCard className="h-4 w-4 mr-1" />
+                      {t.pricing}
+                    </Button>
+                    <Button
+                      variant={isActive('/docs') ? 'default' : 'ghost'}
+                      onClick={() => navigate('/docs')}
+                      className={`${isActive('/docs') ? 'bg-[#FF6600] hover:bg-[#FF6600]/90' : ''} px-3`}
+                      size="sm"
+                    >
+                      <FileText className="h-4 w-4 mr-1" />
+                      {t.documents}
+                    </Button>
+                  </nav>
+                )}
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <ThemeToggle />
+                <LanguageSelector />
+                
+                {user ? (
+                  <div className="flex items-center space-x-2">
+                    <span 
+                      className="text-sm text-muted-foreground cursor-pointer hover:text-[#FF6600] transition-colors"
+                      onClick={() => navigate('/account')}
+                    >
+                      {getUserDisplayName()}
+                    </span>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={handleSignOut}
+                      className="h-9 w-9"
+                      aria-label="Logout"
+                    >
+                      <DoorClosed className="h-4 w-4 text-red-600" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <Button variant="outline" size="sm" onClick={() => navigate('/auth')}>
+                      {t.login}
+                    </Button>
+                    <Button 
+                      className="bg-[#FF6600] hover:bg-[#FF6600]/90"
+                      size="sm"
+                      onClick={() => navigate('/auth?mode=signup')}
+                    >
+                      {t.signup}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Desktop Header */}
+          {isDesktop && (
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-8">
                 <h1 
-                  className="text-2xl font-bold text-black dark:text-white cursor-pointer" 
+                  className="text-2xl font-bold text-foreground cursor-pointer" 
                   onClick={() => navigate('/')}
                 >
                   {t.title}
@@ -138,7 +224,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 {user ? (
                   <div className="flex items-center space-x-2">
                     <span 
-                      className="text-sm text-gray-600 dark:text-gray-300 cursor-pointer hover:text-[#FF6600] dark:hover:text-[#FF6600] transition-colors"
+                      className="text-sm text-muted-foreground cursor-pointer hover:text-[#FF6600] transition-colors"
                       onClick={() => navigate('/account')}
                     >
                       {getUserDisplayName()}
@@ -196,10 +282,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   {t.documents}
                 </Button>
 
-                {/* User Info */}
                 <div className="flex items-center justify-between py-2 border-t dark:border-gray-700 pt-4">
                   <span 
-                    className="text-sm text-gray-600 dark:text-gray-300 cursor-pointer hover:text-[#FF6600] dark:hover:text-[#FF6600] transition-colors"
+                    className="text-sm text-muted-foreground cursor-pointer hover:text-[#FF6600] transition-colors"
                     onClick={() => handleNavigation('/account')}
                   >
                     {getUserDisplayName()}

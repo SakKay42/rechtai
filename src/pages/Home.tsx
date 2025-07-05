@@ -21,13 +21,13 @@ export const Home: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-16">
+    <div className="container mx-auto px-4 py-16 touch-manipulation">
       {/* Hero Section */}
       <div className="text-center mb-16">
-        <h1 className="text-5xl font-bold text-black dark:text-white mb-6">
+        <h1 className="text-5xl font-bold text-foreground mb-6">
           {t.title}
         </h1>
-        <p className="text-lg text-gray-500 dark:text-gray-400 mb-8 max-w-3xl mx-auto">
+        <p className="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto">
           {t.description}
         </p>
         
@@ -48,10 +48,10 @@ export const Home: React.FC = () => {
             <div className="w-12 h-12 bg-[#FF6600]/10 rounded-2xl flex items-center justify-center mb-4">
               <Globe className="h-6 w-6 text-[#FF6600]" />
             </div>
-            <CardTitle className="text-xl font-bold dark:text-white">6 {t.languages}</CardTitle>
+            <CardTitle className="text-xl font-bold text-foreground">6 {t.languages}</CardTitle>
           </CardHeader>
           <CardContent>
-            <CardDescription className="text-gray-600 dark:text-gray-300">
+            <CardDescription className="text-muted-foreground">
               Nederlands, English, العربية, Español, Русский, Français
             </CardDescription>
           </CardContent>
@@ -62,10 +62,10 @@ export const Home: React.FC = () => {
             <div className="w-12 h-12 bg-[#FF6600]/10 rounded-2xl flex items-center justify-center mb-4">
               <MessageCircle className="h-6 w-6 text-[#FF6600]" />
             </div>
-            <CardTitle className="text-xl font-bold dark:text-white">AI {t.chat}</CardTitle>
+            <CardTitle className="text-xl font-bold text-foreground">AI {t.chat}</CardTitle>
           </CardHeader>
           <CardContent>
-            <CardDescription className="text-gray-600 dark:text-gray-300">
+            <CardDescription className="text-muted-foreground">
               {t.getHelp}
             </CardDescription>
           </CardContent>
@@ -76,10 +76,10 @@ export const Home: React.FC = () => {
             <div className="w-12 h-12 bg-[#FF6600]/10 rounded-2xl flex items-center justify-center mb-4">
               <Download className="h-6 w-6 text-[#FF6600]" />
             </div>
-            <CardTitle className="text-xl font-bold dark:text-white">PDF {t.documents}</CardTitle>
+            <CardTitle className="text-xl font-bold text-foreground">PDF {t.documents}</CardTitle>
           </CardHeader>
           <CardContent>
-            <CardDescription className="text-gray-600 dark:text-gray-300">
+            <CardDescription className="text-muted-foreground">
               {t.pdfExport}
             </CardDescription>
           </CardContent>
@@ -88,10 +88,10 @@ export const Home: React.FC = () => {
 
       {/* CTA Section */}
       <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-2xl p-12">
-        <h2 className="text-3xl font-bold text-black dark:text-white mb-4">
+        <h2 className="text-3xl font-bold text-foreground mb-4">
           {t.getHelp}
         </h2>
-        <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+        <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
           {t.description}
         </p>
         
