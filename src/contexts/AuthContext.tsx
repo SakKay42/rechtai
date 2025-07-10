@@ -27,6 +27,55 @@ export const useAuth = () => {
   return context;
 };
 
+// Helper function to sanitize and validate profile updates
+const sanitizeProfileUpdates = (updates: Partial<Profile>): Partial<Profile> => {
+  // Only allow specific non-sensitive fields to be updated
+  const allowedFields = [
+    'first_name',
+    'last_name', 
+    'preferred_language',
+    'email'
+  ] as const;
+  
+  const sanitized: Partial<Profile> = {};
+  
+  for (const field of allowedFields) {
+    if (field in updates && updates[field] !== undefined) {
+      let value = updates[field];
+      
+      // Sanitize string inputs to prevent XSS
+      if (typeof value === 'string') {
+        value = value.trim();
+        // Basic XSS prevention - remove script tags and javascript: protocols
+        value = value.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+        value = value.replace(/javascript:/gi, '');
+        
+        // Validate length
+        if (field === 'first_name' || field === 'last_name') {
+          if (value.length > 50) {
+            throw new Error(`${field} must be 50 characters or less`);
+          }
+        }
+        if (field === 'email' && value.length > 254) {
+          throw new Error('Email must be 254 characters or less');
+        }
+      }
+      
+      // Validate preferred_language enum
+      if (field === 'preferred_language') {
+        const validLanguages = ['nl', 'en', 'ar', 'es', 'ru', 'fr', 'pl', 'de'];
+        if (!validLanguages.includes(value as string)) {
+          throw new Error('Invalid language selection');
+        }
+      }
+      
+      sanitized[field] = value;
+    }
+  }
+  
+  return sanitized;
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -90,16 +139,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string, firstName?: string, lastName?: string, preferredLanguage = 'nl') => {
+    // Input validation and sanitization
+    if (!email || !password) {
+      return { error: new Error('Email and password are required') };
+    }
+    
+    if (password.length < 6) {
+      return { error: new Error('Password must be at least 6 characters') };
+    }
+    
+    // Sanitize inputs
+    const sanitizedEmail = email.trim().toLowerCase();
+    const sanitizedFirstName = firstName?.trim().substring(0, 50);
+    const sanitizedLastName = lastName?.trim().substring(0, 50);
+    
     const redirectUrl = `${window.location.origin}/`;
     
     const { error } = await supabase.auth.signUp({
-      email,
+      email: sanitizedEmail,
       password,
       options: {
         emailRedirectTo: redirectUrl,
         data: {
-          first_name: firstName,
-          last_name: lastName,
+          first_name: sanitizedFirstName,
+          last_name: sanitizedLastName,
           preferred_language: preferredLanguage
         }
       }
@@ -109,8 +172,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signIn = async (email: string, password: string) => {
+    // Input validation
+    if (!email || !password) {
+      return { error: new Error('Email and password are required') };
+    }
+    
     const { error } = await supabase.auth.signInWithPassword({
-      email,
+      email: email.trim().toLowerCase(),
       password
     });
     
@@ -125,16 +193,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user) return { error: new Error('No user logged in') };
     
-    const { error } = await supabase
-      .from('profiles')
-      .update(updates)
-      .eq('id', user.id);
-    
-    if (!error && profile) {
-      setProfile({ ...profile, ...updates });
+    try {
+      // Sanitize and validate the updates
+      const sanitizedUpdates = sanitizeProfileUpdates(updates);
+      
+      if (Object.keys(sanitizedUpdates).length === 0) {
+        return { error: new Error('No valid fields to update') };
+      }
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update(sanitizedUpdates)
+        .eq('id', user.id);
+      
+      if (!error && profile) {
+        setProfile({ ...profile, ...sanitizedUpdates });
+      }
+      
+      return { error };
+    } catch (validationError) {
+      return { error: validationError };
     }
-    
-    return { error };
   };
 
   const value = {

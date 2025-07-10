@@ -9,6 +9,48 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 
+// Helper function to sanitize and validate inputs
+const sanitizeInput = (input: string, maxLength: number = 100): string => {
+  if (!input || typeof input !== 'string') return '';
+  
+  return input
+    .trim()
+    .substring(0, maxLength)
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/javascript:/gi, '')
+    .replace(/on\w+\s*=/gi, '');
+};
+
+const validateEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email) && email.length <= 254;
+};
+
+const validatePassword = (password: string): { valid: boolean; error?: string } => {
+  if (password.length < 6) {
+    return { valid: false, error: 'Password must be at least 6 characters long' };
+  }
+  if (password.length > 128) {
+    return { valid: false, error: 'Password must be less than 128 characters' };
+  }
+  return { valid: true };
+};
+
+const validateName = (name: string): { valid: boolean; error?: string } => {
+  if (name.length === 0) {
+    return { valid: false, error: 'Name is required' };
+  }
+  if (name.length > 50) {
+    return { valid: false, error: 'Name must be 50 characters or less' };
+  }
+  // Basic name validation - letters, spaces, hyphens, apostrophes
+  const nameRegex = /^[a-zA-Z\s\-']+$/;
+  if (!nameRegex.test(name)) {
+    return { valid: false, error: 'Name can only contain letters, spaces, hyphens, and apostrophes' };
+  }
+  return { valid: true };
+};
+
 export const Auth: React.FC = () => {
   const { signIn, signUp, user } = useAuth();
   const { t, language } = useLanguage();
@@ -23,6 +65,7 @@ export const Auth: React.FC = () => {
     firstName: '',
     lastName: ''
   });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -31,17 +74,65 @@ export const Auth: React.FC = () => {
     }
   }, [user, navigate]);
 
+  const validateForm = (): boolean => {
+    const newErrors: { [key: string]: string } = {};
+
+    // Validate email
+    if (!validateEmail(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    // Validate password
+    const passwordValidation = validatePassword(formData.password);
+    if (!passwordValidation.valid) {
+      newErrors.password = passwordValidation.error!;
+    }
+
+    // Validate names for signup
+    if (isSignUp) {
+      if (formData.firstName) {
+        const firstNameValidation = validateName(formData.firstName);
+        if (!firstNameValidation.valid) {
+          newErrors.firstName = firstNameValidation.error!;
+        }
+      }
+      
+      if (formData.lastName) {
+        const lastNameValidation = validateName(formData.lastName);
+        if (!lastNameValidation.valid) {
+          newErrors.lastName = lastNameValidation.error!;
+        }
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
 
     try {
+      // Sanitize inputs before sending
+      const sanitizedData = {
+        email: sanitizeInput(formData.email, 254).toLowerCase(),
+        password: formData.password, // Don't sanitize password
+        firstName: sanitizeInput(formData.firstName, 50),
+        lastName: sanitizeInput(formData.lastName, 50)
+      };
+
       if (isSignUp) {
         const { error } = await signUp(
-          formData.email, 
-          formData.password, 
-          formData.firstName, 
-          formData.lastName,
+          sanitizedData.email, 
+          sanitizedData.password, 
+          sanitizedData.firstName, 
+          sanitizedData.lastName,
           language
         );
         
@@ -55,7 +146,7 @@ export const Auth: React.FC = () => {
           toast.success('Registration successful! Please check your email to confirm your account.');
         }
       } else {
-        const { error } = await signIn(formData.email, formData.password);
+        const { error } = await signIn(sanitizedData.email, sanitizedData.password);
         
         if (error) {
           if (error.message.includes('Invalid login credentials')) {
@@ -77,10 +168,20 @@ export const Auth: React.FC = () => {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [name]: value
     }));
+
+    // Clear error for this field when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
   };
 
   return (
@@ -108,8 +209,12 @@ export const Auth: React.FC = () => {
                       type="text"
                       value={formData.firstName}
                       onChange={handleInputChange}
-                      required={isSignUp}
+                      maxLength={50}
+                      className={errors.firstName ? 'border-red-500' : ''}
                     />
+                    {errors.firstName && (
+                      <p className="text-sm text-red-500">{errors.firstName}</p>
+                    )}
                   </div>
                   
                   <div className="space-y-2">
@@ -120,8 +225,12 @@ export const Auth: React.FC = () => {
                       type="text"
                       value={formData.lastName}
                       onChange={handleInputChange}
-                      required={isSignUp}
+                      maxLength={50}
+                      className={errors.lastName ? 'border-red-500' : ''}
                     />
+                    {errors.lastName && (
+                      <p className="text-sm text-red-500">{errors.lastName}</p>
+                    )}
                   </div>
                 </>
               )}
@@ -135,7 +244,12 @@ export const Auth: React.FC = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                   required
+                  maxLength={254}
+                  className={errors.email ? 'border-red-500' : ''}
                 />
+                {errors.email && (
+                  <p className="text-sm text-red-500">{errors.email}</p>
+                )}
               </div>
               
               <div className="space-y-2">
@@ -148,7 +262,12 @@ export const Auth: React.FC = () => {
                   onChange={handleInputChange}
                   required
                   minLength={6}
+                  maxLength={128}
+                  className={errors.password ? 'border-red-500' : ''}
                 />
+                {errors.password && (
+                  <p className="text-sm text-red-500">{errors.password}</p>
+                )}
               </div>
               
               <Button 

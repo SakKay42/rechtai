@@ -17,6 +17,18 @@ interface ChatSession {
   status: string;
 }
 
+// Helper function to sanitize display text
+const sanitizeDisplayText = (text: string): string => {
+  if (!text || typeof text !== 'string') return '';
+  
+  return text
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;');
+};
+
 export const Account: React.FC = () => {
   const { t } = useLanguage();
   const { user, profile } = useAuth();
@@ -98,22 +110,22 @@ export const Account: React.FC = () => {
             <div className="space-y-4">
               <div>
                 <p className="font-medium dark:text-white">Email:</p>
-                <p className="text-gray-600 dark:text-gray-300">{user.email}</p>
+                <p className="text-gray-600 dark:text-gray-300">{sanitizeDisplayText(user.email || '')}</p>
               </div>
               {profile && (
                 <>
                   <div>
                     <p className="font-medium dark:text-white">{t.firstName}:</p>
-                    <p className="text-gray-600 dark:text-gray-300">{profile.first_name || 'Not set'}</p>
+                    <p className="text-gray-600 dark:text-gray-300">{sanitizeDisplayText(profile.first_name || 'Not set')}</p>
                   </div>
                   <div>
                     <p className="font-medium dark:text-white">{t.lastName}:</p>
-                    <p className="text-gray-600 dark:text-gray-300">{profile.last_name || 'Not set'}</p>
+                    <p className="text-gray-600 dark:text-gray-300">{sanitizeDisplayText(profile.last_name || 'Not set')}</p>
                   </div>
                   <div>
                     <p className="font-medium dark:text-white">Subscription:</p>
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-600 dark:text-gray-300 capitalize">{profile.role}</span>
+                      <span className="text-gray-600 dark:text-gray-300 capitalize">{sanitizeDisplayText(profile.role)}</span>
                       {profile.is_premium && (
                         <span className="px-2 py-1 bg-[#FF6600] text-white text-xs rounded-full">
                           Premium
@@ -154,7 +166,7 @@ export const Account: React.FC = () => {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <h4 className="font-medium text-gray-900 dark:text-white mb-1 line-clamp-1">
-                          {chat.title}
+                          {sanitizeDisplayText(chat.title)}
                         </h4>
                         <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                           <div className="flex items-center gap-1">
@@ -162,7 +174,7 @@ export const Account: React.FC = () => {
                             {formatDate(chat.updated_at)}
                           </div>
                           <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(chat.status)}`}>
-                            {chat.status}
+                            {sanitizeDisplayText(chat.status)}
                           </span>
                         </div>
                       </div>
