@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,7 +28,7 @@ export const useAuth = () => {
 
 // Helper function to sanitize and validate profile updates
 const sanitizeProfileUpdates = (updates: Partial<Profile>): Partial<Profile> => {
-  // Only allow specific non-sensitive fields to be updated
+  // Only allow specific non-sensitive fields to be updated (excluding role and is_premium)
   const allowedFields = [
     'first_name',
     'last_name', 
@@ -49,6 +48,7 @@ const sanitizeProfileUpdates = (updates: Partial<Profile>): Partial<Profile> => 
         // Basic XSS prevention - remove script tags and javascript: protocols
         value = value.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
         value = value.replace(/javascript:/gi, '');
+        value = value.replace(/on\w+\s*=/gi, ''); // Remove event handlers
         
         // Validate length
         if (field === 'first_name' || field === 'last_name') {
@@ -61,12 +61,15 @@ const sanitizeProfileUpdates = (updates: Partial<Profile>): Partial<Profile> => 
         }
       }
       
-      // Validate preferred_language enum
+      // Validate preferred_language enum with proper type checking
       if (field === 'preferred_language') {
-        const validLanguages = ['nl', 'en', 'ar', 'es', 'ru', 'fr', 'pl', 'de'];
-        if (!validLanguages.includes(value as string)) {
+        const validLanguages = ['nl', 'en', 'ar', 'es', 'ru', 'fr', 'pl', 'de'] as const;
+        if (typeof value === 'string' && validLanguages.includes(value as any)) {
+          sanitized[field] = value as Profile['preferred_language'];
+        } else {
           throw new Error('Invalid language selection');
         }
+        continue;
       }
       
       sanitized[field] = value;
