@@ -8,6 +8,14 @@ export async function callN8NWebhook(data: any, language: string) {
     return null;
   }
 
+  // Validate webhook URL format
+  try {
+    new URL(n8nWebhookUrl);
+  } catch {
+    console.error('❌ Invalid N8N_WEBHOOK_URL format:', n8nWebhookUrl);
+    return null;
+  }
+
   try {
     console.log('🔄 Calling N8N webhook:', {
       url: n8nWebhookUrl,
@@ -22,6 +30,7 @@ export async function callN8NWebhook(data: any, language: string) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'User-Agent': 'Supabase-Edge-Function/1.0'
       },
       body: JSON.stringify({
         ...data,
@@ -35,7 +44,7 @@ export async function callN8NWebhook(data: any, language: string) {
     console.log('📡 N8N webhook response status:', response.status);
 
     if (!response.ok) {
-      const errorText = await response.text();
+      const errorText = await response.text().catch(() => 'Unknown error');
       console.error('❌ N8N webhook failed:', {
         status: response.status,
         statusText: response.statusText,
@@ -44,7 +53,21 @@ export async function callN8NWebhook(data: any, language: string) {
       return null;
     }
 
+    // Validate content type
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('❌ N8N webhook returned non-JSON response');
+      return null;
+    }
+
     const result = await response.json();
+    
+    // Enhanced response validation
+    if (!result || typeof result !== 'object') {
+      console.error('❌ Invalid response format from N8N webhook');
+      return null;
+    }
+
     console.log('✅ N8N webhook response received:', result);
     return result;
   } catch (error) {
@@ -58,6 +81,93 @@ export async function callN8NWebhook(data: any, language: string) {
       });
     }
     return null;
+  }
+}
+
+// Main function to generate chat response (required by index.ts)
+export async function generateChatResponse(message: string, language: string = 'en'): Promise<string> {
+  const n8nWebhookUrl = Deno.env.get('N8N_WEBHOOK_URL');
+  
+  if (!n8nWebhookUrl) {
+    throw new Error('N8N webhook URL not configured');
+  }
+
+  // Validate webhook URL format
+  try {
+    new URL(n8nWebhookUrl);
+  } catch {
+    throw new Error('Invalid N8N webhook URL format');
+  }
+
+  try {
+    // Add timeout to prevent hanging requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+    const response = await fetch(n8nWebhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Supabase-Edge-Function/1.0'
+      },
+      body: JSON.stringify({
+        message: message,
+        language: language,
+        timestamp: new Date().toISOString()
+      }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Unknown error');
+      throw new Error(`N8N webhook failed: ${response.status} ${response.statusText} - ${errorText}`);
+    }
+
+    // Validate content type
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('N8N webhook returned non-JSON response');
+    }
+
+    const data = await response.json();
+    
+    // Enhanced response validation
+    if (!data || typeof data !== 'object') {
+      throw new Error('Invalid response format from N8N webhook');
+    }
+
+    if (!data.response || typeof data.response !== 'string') {
+      throw new Error('Missing or invalid response field from N8N webhook');
+    }
+
+    // Validate response length
+    if (data.response.length > 50000) {
+      throw new Error('Response from N8N webhook is too long');
+    }
+
+    // Basic XSS protection for response
+    const cleanResponse = data.response
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/javascript:/gi, '')
+      .replace(/on\w+\s*=/gi, '');
+
+    return cleanResponse;
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.error('N8N webhook timeout');
+      throw new Error('AI service timeout - please try again');
+    }
+    
+    console.error('N8N webhook error:', error);
+    
+    // Don't expose internal error details to client
+    if (error.message.includes('Failed to generate AI response')) {
+      throw error;
+    }
+    
+    throw new Error('Failed to generate AI response');
   }
 }
 
