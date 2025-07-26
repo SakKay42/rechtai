@@ -85,7 +85,7 @@ export async function callN8NWebhook(data: any, language: string) {
 }
 
 // Main function to generate chat response (required by index.ts)
-export async function generateChatResponse(message: string, language: string = 'en'): Promise<string> {
+export async function generateChatResponse(message: string, language: string = 'en', attachments?: any[]): Promise<string> {
   const n8nWebhookUrl = Deno.env.get('N8N_WEBHOOK_URL');
   
   if (!n8nWebhookUrl) {
@@ -113,6 +113,7 @@ export async function generateChatResponse(message: string, language: string = '
       body: JSON.stringify({
         message: message,
         language: language,
+        attachments: attachments || [],
         timestamp: new Date().toISOString()
       }),
       signal: controller.signal

@@ -11,11 +11,14 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Send, Loader2, Globe, History, Plus } from 'lucide-react';
+import { FileUpload, FileAttachment } from '@/components/chat/FileUpload';
+import { MessageAttachments } from '@/components/chat/MessageAttachments';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: string;
+  attachments?: FileAttachment[];
 }
 
 interface ChatSession {
@@ -45,6 +48,7 @@ export const Chat: React.FC = () => {
   const [currentChat, setCurrentChat] = useState<ChatSession | null>(null);
   const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [attachedFiles, setAttachedFiles] = useState<FileAttachment[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -153,10 +157,12 @@ export const Chat: React.FC = () => {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!message.trim() || isLoading) return;
+    if ((!message.trim() && attachedFiles.length === 0) || isLoading) return;
 
     const userMessage = message.trim();
+    const messageAttachments = [...attachedFiles];
     setMessage('');
+    setAttachedFiles([]);
     setIsLoading(true);
 
     console.log('🌍 Sending message with language:', language);
@@ -170,8 +176,9 @@ export const Chat: React.FC = () => {
     try {
       const newUserMessage: Message = {
         role: 'user',
-        content: userMessage,
-        timestamp: new Date().toISOString()
+        content: userMessage || 'Файлы прикреплены',
+        timestamp: new Date().toISOString(),
+        attachments: messageAttachments
       };
 
       if (currentChat) {
@@ -187,7 +194,8 @@ export const Chat: React.FC = () => {
         body: {
           message: userMessage,
           chatId: currentChat?.id,
-          language: language
+          language: language,
+          attachments: messageAttachments
         }
       });
 
@@ -438,18 +446,21 @@ export const Chat: React.FC = () => {
                           key={index}
                           className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
-                          <div
-                            className={`max-w-[85%] md:max-w-[80%] p-3 rounded-lg ${
-                              msg.role === 'user'
-                                ? 'bg-[#FF6600] text-white'
-                                : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
-                            }`}
-                          >
-                            <div className="whitespace-pre-wrap text-sm md:text-base">{msg.content}</div>
-                            <div className="text-xs opacity-70 mt-1">
-                              {new Date(msg.timestamp).toLocaleTimeString()}
-                            </div>
-                          </div>
+                           <div
+                             className={`max-w-[85%] md:max-w-[80%] p-3 rounded-lg ${
+                               msg.role === 'user'
+                                 ? 'bg-[#FF6600] text-white'
+                                 : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
+                             }`}
+                           >
+                             <div className="whitespace-pre-wrap text-sm md:text-base">{msg.content}</div>
+                             {msg.attachments && msg.attachments.length > 0 && (
+                               <MessageAttachments attachments={msg.attachments} />
+                             )}
+                             <div className="text-xs opacity-70 mt-1">
+                               {new Date(msg.timestamp).toLocaleTimeString()}
+                             </div>
+                           </div>
                         </div>
                       ))}
                       <div ref={messagesEndRef} />
@@ -471,26 +482,36 @@ export const Chat: React.FC = () => {
 
               {/* Message Input */}
               <div className="border-t dark:border-gray-700 p-4 flex-shrink-0">
-                <form onSubmit={handleSendMessage} className="flex gap-2">
-                  <Input
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder={t.typeYourLegalQuestion || "Type your legal question..."}
-                    disabled={isLoading}
-                    className="flex-1 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 text-sm md:text-base"
+                <div className="space-y-3">
+                  {/* File Upload */}
+                  <FileUpload 
+                    onFilesChange={setAttachedFiles}
+                    attachedFiles={attachedFiles}
+                    sessionId={currentChat?.id}
                   />
-                  <Button
-                    type="submit"
-                    disabled={!message.trim() || isLoading}
-                    className="bg-[#FF6600] hover:bg-[#FF6600]/90 px-3 md:px-4"
-                  >
-                    {isLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Send className="h-4 w-4" />
-                    )}
-                  </Button>
-                </form>
+                  
+                  {/* Message Form */}
+                  <form onSubmit={handleSendMessage} className="flex gap-2">
+                    <Input
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      placeholder={t.typeYourLegalQuestion || "Type your legal question..."}
+                      disabled={isLoading}
+                      className="flex-1 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 text-sm md:text-base"
+                    />
+                    <Button
+                      type="submit"
+                      disabled={(!message.trim() && attachedFiles.length === 0) || isLoading}
+                      className="bg-[#FF6600] hover:bg-[#FF6600]/90 px-3 md:px-4"
+                    >
+                      {isLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Send className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </form>
+                </div>
               </div>
             </CardContent>
           </Card>

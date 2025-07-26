@@ -48,16 +48,16 @@ serve(async (req) => {
       )
     }
 
-    const { message, sessionId, language } = await req.json()
+    const { message, sessionId, language, attachments } = await req.json()
 
     // Validate and sanitize inputs
-    const validationResult = validateInput({ message, sessionId, language })
+    const validationResult = validateInput({ message, sessionId, language, attachments })
     if (!validationResult.valid) {
       throw new Error(validationResult.error)
     }
 
     // Additional sanitization
-    const sanitizedMessage = sanitizeInput(message);
+    const sanitizedMessage = sanitizeInput(message || '');
     
     console.log('Processing chat request:', {
       userId: user.id,
@@ -69,7 +69,7 @@ serve(async (req) => {
     });
 
     // Generate AI response
-    const aiResponse = await generateChatResponse(sanitizedMessage, language)
+    const aiResponse = await generateChatResponse(sanitizedMessage, language, attachments)
 
     // Create or update chat session
     let chatSession

@@ -5,17 +5,19 @@ export function validateInput(data: any): { valid: boolean; error?: string } {
     return { valid: false, error: 'Invalid request body format' };
   }
 
-  const { message, sessionId, language } = data;
+  const { message, sessionId, language, attachments } = data;
   
-  // Validate message
+  // Validate message (allow empty if attachments are provided)
   if (!message || typeof message !== 'string') {
-    return { valid: false, error: 'Message is required and must be a string' };
+    if (!attachments || !Array.isArray(attachments) || attachments.length === 0) {
+      return { valid: false, error: 'Message is required and must be a string, or attachments must be provided' };
+    }
   }
   
-  // Strict message validation
-  const trimmedMessage = message.trim();
-  if (trimmedMessage.length === 0) {
-    return { valid: false, error: 'Message cannot be empty' };
+  // Strict message validation (allow empty if attachments provided)
+  const trimmedMessage = message ? message.trim() : '';
+  if (trimmedMessage.length === 0 && (!attachments || attachments.length === 0)) {
+    return { valid: false, error: 'Message cannot be empty unless attachments are provided' };
   }
   
   if (trimmedMessage.length > 10000) {
@@ -62,8 +64,34 @@ export function validateInput(data: any): { valid: boolean; error?: string } {
     }
   }
   
+  // Validate attachments if provided
+  if (attachments !== undefined && attachments !== null) {
+    if (!Array.isArray(attachments)) {
+      return { valid: false, error: 'Attachments must be an array' };
+    }
+    
+    if (attachments.length > 5) {
+      return { valid: false, error: 'Maximum 5 attachments allowed' };
+    }
+    
+    for (const attachment of attachments) {
+      if (!attachment || typeof attachment !== 'object') {
+        return { valid: false, error: 'Each attachment must be an object' };
+      }
+      
+      const { id, name, size, type, url } = attachment;
+      if (!id || !name || typeof size !== 'number' || !type || !url) {
+        return { valid: false, error: 'Attachment missing required fields: id, name, size, type, url' };
+      }
+      
+      if (size > 10 * 1024 * 1024) { // 10MB limit
+        return { valid: false, error: `Attachment ${name} exceeds 10MB limit` };
+      }
+    }
+  }
+
   // Check for unexpected additional fields
-  const allowedFields = ['message', 'sessionId', 'language'];
+  const allowedFields = ['message', 'sessionId', 'language', 'attachments'];
   const extraFields = Object.keys(data).filter(key => !allowedFields.includes(key));
   if (extraFields.length > 0) {
     return { valid: false, error: `Unexpected fields: ${extraFields.join(', ')}` };
