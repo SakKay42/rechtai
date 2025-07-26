@@ -45,7 +45,10 @@ export const translations = {
     documentGeneration: 'Document Generation',
     theme: 'Theme',
     darkMode: 'Dark Mode',
-    lightMode: 'Light Mode'
+    lightMode: 'Light Mode',
+    attachFile: 'File',
+    attachPhoto: 'Photo',
+    takePhoto: 'Take Photo'
   },
   nl: {
     title: 'RechtAI',
@@ -92,7 +95,10 @@ export const translations = {
     documentGeneration: 'Document Generatie',
     theme: 'Thema',
     darkMode: 'Donkere Modus',
-    lightMode: 'Lichte Modus'
+    lightMode: 'Lichte Modus',
+    attachFile: 'Bestand',
+    attachPhoto: 'Foto',
+    takePhoto: 'Foto Maken'
   },
   ru: {
     title: 'RechtAI',
@@ -139,7 +145,10 @@ export const translations = {
     documentGeneration: 'Генерация документов',
     theme: 'Тема',
     darkMode: 'Темный Режим',
-    lightMode: 'Светлый Режим'
+    lightMode: 'Светлый Режим',
+    attachFile: 'Файл',
+    attachPhoto: 'Фото',
+    takePhoto: 'Сделать Фото'
   },
   fr: {
     title: 'RechtAI',
@@ -186,7 +195,10 @@ export const translations = {
     documentGeneration: 'Génération de documents',
     theme: 'Thème',
     darkMode: 'Mode Sombre',
-    lightMode: 'Mode Clair'
+    lightMode: 'Mode Clair',
+    attachFile: 'Fichier',
+    attachPhoto: 'Photo',
+    takePhoto: 'Prendre une Photo'
   },
   es: {
     title: 'RechtAI',
@@ -233,7 +245,10 @@ export const translations = {
     documentGeneration: 'Generación de documentos',
     theme: 'Tema',
     darkMode: 'Modo Oscuro',
-    lightMode: 'Modo Claro'
+    lightMode: 'Modo Claro',
+    attachFile: 'Archivo',
+    attachPhoto: 'Foto',
+    takePhoto: 'Tomar Foto'
   },
   ar: {
     title: 'RechtAI',
@@ -280,7 +295,10 @@ export const translations = {
     documentGeneration: 'توليد الوثائق',
     theme: 'السمة',
     darkMode: 'الوضع المظلم',
-    lightMode: 'الوضع الفاتح'
+    lightMode: 'الوضع الفاتح',
+    attachFile: 'ملف',
+    attachPhoto: 'صورة',
+    takePhoto: 'التقاط صورة'
   },
   pl: {
     title: 'RechtAI',
@@ -327,7 +345,10 @@ export const translations = {
     documentGeneration: 'Generowanie Dokumentów',
     theme: 'Motyw',
     darkMode: 'Tryb Ciemny',
-    lightMode: 'Tryb Jasny'
+    lightMode: 'Tryb Jasny',
+    attachFile: 'Plik',
+    attachPhoto: 'Zdjęcie',
+    takePhoto: 'Zrób Zdjęcie'
   },
   de: {
     title: 'RechtAI',
@@ -374,7 +395,10 @@ export const translations = {
     documentGeneration: 'Dokumentengenerierung',
     theme: 'Theme',
     darkMode: 'Dunkler Modus',
-    lightMode: 'Heller Modus'
+    lightMode: 'Heller Modus',
+    attachFile: 'Datei',
+    attachPhoto: 'Foto',
+    takePhoto: 'Foto Aufnehmen'
   }
 };
 
