@@ -419,7 +419,7 @@ export const Chat: React.FC = () => {
                 
                 <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                   <Globe className="h-4 w-4" />
-                  <span className="hidden sm:inline">{language.toUpperCase()}</span>
+                  <span className="text-xs">{language.toUpperCase()}</span>
                 </div>
               </div>
               
