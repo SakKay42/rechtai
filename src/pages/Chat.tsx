@@ -614,8 +614,8 @@ ${t.recommendRegisteredMail}`,
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 overflow-hidden">
-      <div className="flex gap-4 h-[80vh] overflow-hidden">
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex gap-4 h-[calc(100vh-6rem)]">
         {/* Desktop Chat History Sidebar */}
         {!isMobile && (
           <div className="w-1/4 min-w-[250px]">
@@ -631,7 +631,7 @@ ${t.recommendRegisteredMail}`,
                 </Button>
               </CardHeader>
               <CardContent className="p-0">
-                <ScrollArea className="h-[calc(100%-8rem)]">
+                <ScrollArea className="h-[calc(100vh-16rem)] overflow-y-auto">
                   <div className="p-4 space-y-2">
                     {chatHistory.map((chat) => (
                       <Button
@@ -687,7 +687,7 @@ ${t.recommendRegisteredMail}`,
                             <Plus className="h-4 w-4 mr-2" />
                             {t.startChat}
                           </Button>
-                          <ScrollArea className="h-[calc(100vh-12rem)]">
+                          <ScrollArea className="h-[calc(100vh-14rem)] overflow-y-auto">
                             <div className="space-y-2">
                               {chatHistory.map((chat) => (
                                 <Button
@@ -734,8 +734,8 @@ ${t.recommendRegisteredMail}`,
             
             <CardContent className="flex-1 flex flex-col p-0 min-h-0">
               {/* Messages Area */}
-              <div className="flex-1 min-h-0 overflow-hidden">
-                <ScrollArea className="h-full p-4">
+              <div className="flex-1 min-h-0">
+                <ScrollArea className="h-[calc(100vh-12rem)] overflow-y-auto p-4">
                   {currentChat?.messages.length ? (
                     <div className="space-y-4">
                       {currentChat.messages.map((msg, index) => (
