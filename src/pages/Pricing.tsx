@@ -23,7 +23,7 @@ export const Pricing: React.FC = () => {
         'Basic support',
         'Multi-language interface'
       ],
-      cta: currentPlan === 'free' ? 'Current Plan' : 'Downgrade',
+      cta: currentPlan === 'free' ? t.currentPlan : t.downgrade,
       disabled: currentPlan === 'free' || !user,
       isCurrentPlan: currentPlan === 'free',
       planType: 'free'
@@ -39,7 +39,7 @@ export const Pricing: React.FC = () => {
         'Priority support',
         'Advanced AI features'
       ],
-      cta: currentPlan === 'premium' ? 'Current Plan' : (user ? 'Upgrade Now' : 'Sign Up to Upgrade'),
+      cta: currentPlan === 'premium' ? t.currentPlan : (user ? t.upgradeNow : t.signUpToUpgrade),
       disabled: currentPlan === 'premium',
       isCurrentPlan: currentPlan === 'premium',
       popular: currentPlan !== 'premium', // Only show popular badge if not current plan

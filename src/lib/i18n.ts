@@ -48,6 +48,10 @@ export const translations = {
     lightMode: 'Light Mode',
     attachFile: 'File',
     attachPhoto: 'Photo',
+    currentPlan: 'Current Plan',
+    upgradeNow: 'Upgrade Now',
+    downgrade: 'Downgrade',
+    signUpToUpgrade: 'Sign Up to Upgrade',
     takePhoto: 'Take Photo'
   },
   nl: {
@@ -98,6 +102,10 @@ export const translations = {
     lightMode: 'Lichte Modus',
     attachFile: 'Bestand',
     attachPhoto: 'Foto',
+    currentPlan: 'Huidig Plan',
+    upgradeNow: 'Nu Upgraden',
+    downgrade: 'Downgraden',
+    signUpToUpgrade: 'Registreer om te Upgraden',
     takePhoto: 'Foto Maken'
   },
   ru: {
@@ -148,6 +156,10 @@ export const translations = {
     lightMode: 'Светлый Режим',
     attachFile: 'Файл',
     attachPhoto: 'Фото',
+    currentPlan: 'Текущий План',
+    upgradeNow: 'Обновить Сейчас',
+    downgrade: 'Понизить',
+    signUpToUpgrade: 'Зарегистрируйтесь для Обновления',
     takePhoto: 'Сделать Фото'
   },
   fr: {
@@ -198,6 +210,10 @@ export const translations = {
     lightMode: 'Mode Clair',
     attachFile: 'Fichier',
     attachPhoto: 'Photo',
+    currentPlan: 'Plan Actuel',
+    upgradeNow: 'Mettre à Niveau',
+    downgrade: 'Rétrograder',
+    signUpToUpgrade: 'S\'inscrire pour Mettre à Niveau',
     takePhoto: 'Prendre une Photo'
   },
   es: {
@@ -248,6 +264,10 @@ export const translations = {
     lightMode: 'Modo Claro',
     attachFile: 'Archivo',
     attachPhoto: 'Foto',
+    currentPlan: 'Plan Actual',
+    upgradeNow: 'Actualizar Ahora',
+    downgrade: 'Degradar',
+    signUpToUpgrade: 'Regístrate para Actualizar',
     takePhoto: 'Tomar Foto'
   },
   ar: {
@@ -298,6 +318,10 @@ export const translations = {
     lightMode: 'الوضع الفاتح',
     attachFile: 'ملف',
     attachPhoto: 'صورة',
+    currentPlan: 'الخطة الحالية',
+    upgradeNow: 'الترقية الآن',
+    downgrade: 'التراجع',
+    signUpToUpgrade: 'التسجيل للترقية',
     takePhoto: 'التقاط صورة'
   },
   pl: {
@@ -348,6 +372,10 @@ export const translations = {
     lightMode: 'Tryb Jasny',
     attachFile: 'Plik',
     attachPhoto: 'Zdjęcie',
+    currentPlan: 'Obecny Plan',
+    upgradeNow: 'Uaktualnij Teraz',
+    downgrade: 'Degraduj',
+    signUpToUpgrade: 'Zarejestruj się aby Uaktualnić',
     takePhoto: 'Zrób Zdjęcie'
   },
   de: {
@@ -398,6 +426,10 @@ export const translations = {
     lightMode: 'Heller Modus',
     attachFile: 'Datei',
     attachPhoto: 'Foto',
+    currentPlan: 'Aktueller Plan',
+    upgradeNow: 'Jetzt Upgraden',
+    downgrade: 'Downgrade',
+    signUpToUpgrade: 'Registrieren zum Upgraden',
     takePhoto: 'Foto Aufnehmen'
   }
 };
