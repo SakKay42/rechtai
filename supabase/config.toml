@@ -1,3 +1,9 @@
 project_id = "hqrmahicnkdnuvtbqwob"
 [functions.environment]
 N8N_WEBHOOK_URL = "https://primary-production-90b2.up.railway.app/webhook/0eee4c15-bb8d-449f-b723-aeb1f411e1ab"
+
+[functions.chat-with-ai]
+verify_jwt = true
+
+[functions.generate-document-pdf]
+verify_jwt = true

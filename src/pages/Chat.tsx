@@ -22,6 +22,29 @@ interface Message {
   attachments?: FileAttachment[];
 }
 
+type ChatMode = 'chat' | 'document-generation';
+type DocumentType = 'deposit-letter' | 'rental-agreement' | 'complaint-letter';
+
+interface DocumentData {
+  userName?: string;
+  userAddress?: string;
+  landlordName?: string;
+  landlordAddress?: string;
+  rentalAddress?: string;
+  depositAmount?: string;
+  moveOutDate?: string;
+}
+
+interface DocumentGenerationState {
+  mode: ChatMode;
+  documentType?: DocumentType;
+  currentQuestion: number;
+  collectedData: DocumentData;
+  questions: string[];
+  isConfirming: boolean;
+  isGenerating: boolean;
+}
+
 interface ChatSession {
   id: string;
   title: string;
@@ -50,6 +73,14 @@ export const Chat: React.FC = () => {
   const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<FileAttachment[]>([]);
+  const [documentGenState, setDocumentGenState] = useState<DocumentGenerationState>({
+    mode: 'chat',
+    currentQuestion: 0,
+    collectedData: {},
+    questions: [],
+    isConfirming: false,
+    isGenerating: false
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -155,6 +186,232 @@ export const Chat: React.FC = () => {
     setIsHistoryOpen(false);
   };
 
+  // Document generation functions
+  const getDocumentQuestions = (documentType: DocumentType): string[] => {
+    switch (documentType) {
+      case 'deposit-letter':
+        return [
+          t.questionUserName,
+          t.questionUserAddress,
+          t.questionLandlordName,
+          t.questionLandlordAddress,
+          t.questionRentalAddress,
+          t.questionDepositAmount,
+          t.questionMoveOutDate
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const enterDocumentMode = (documentType: DocumentType) => {
+    const questions = getDocumentQuestions(documentType);
+    setDocumentGenState({
+      mode: 'document-generation',
+      documentType,
+      currentQuestion: 0,
+      collectedData: {},
+      questions,
+      isConfirming: false,
+      isGenerating: false
+    });
+
+    // Add AI message to start the process
+    const startMessage: Message = {
+      role: 'assistant',
+      content: t.documentModeStart,
+      timestamp: new Date().toISOString()
+    };
+
+    if (currentChat) {
+      setCurrentChat({
+        ...currentChat,
+        messages: [...currentChat.messages, startMessage]
+      });
+    }
+
+    // Ask first question
+    setTimeout(() => {
+      const firstQuestionMessage: Message = {
+        role: 'assistant',
+        content: questions[0],
+        timestamp: new Date().toISOString()
+      };
+
+      if (currentChat) {
+        setCurrentChat(prev => prev ? {
+          ...prev,
+          messages: [...prev.messages, firstQuestionMessage]
+        } : null);
+      }
+    }, 500);
+  };
+
+  const handleDocumentAnswer = (answer: string) => {
+    const { currentQuestion, questions, collectedData } = documentGenState;
+    
+    // Map question index to data field
+    const dataKeys = ['userName', 'userAddress', 'landlordName', 'landlordAddress', 'rentalAddress', 'depositAmount', 'moveOutDate'];
+    const currentKey = dataKeys[currentQuestion] as keyof DocumentData;
+    
+    const updatedData = {
+      ...collectedData,
+      [currentKey]: answer
+    };
+
+    if (currentQuestion < questions.length - 1) {
+      // Move to next question
+      setDocumentGenState(prev => ({
+        ...prev,
+        currentQuestion: currentQuestion + 1,
+        collectedData: updatedData
+      }));
+
+      // Ask next question
+      setTimeout(() => {
+        const nextQuestionMessage: Message = {
+          role: 'assistant',
+          content: questions[currentQuestion + 1],
+          timestamp: new Date().toISOString()
+        };
+
+        if (currentChat) {
+          setCurrentChat(prev => prev ? {
+            ...prev,
+            messages: [...prev.messages, nextQuestionMessage]
+          } : null);
+        }
+      }, 500);
+    } else {
+      // All questions answered, show confirmation
+      setDocumentGenState(prev => ({
+        ...prev,
+        collectedData: updatedData,
+        isConfirming: true
+      }));
+
+      showDataConfirmation(updatedData);
+    }
+  };
+
+  const showDataConfirmation = (data: DocumentData) => {
+    const confirmationText = `${t.confirmData}
+
+${t.dataUserName}: ${data.userName}
+${t.dataUserAddress}: ${data.userAddress}
+${t.dataLandlordName}: ${data.landlordName}
+${t.dataLandlordAddress}: ${data.landlordAddress}
+${t.dataRentalAddress}: ${data.rentalAddress}
+${t.dataDepositAmount}: ${data.depositAmount} €
+${t.dataMoveOutDate}: ${data.moveOutDate}
+
+${t.allCorrect}`;
+
+    const confirmationMessage: Message = {
+      role: 'assistant',
+      content: confirmationText,
+      timestamp: new Date().toISOString()
+    };
+
+    if (currentChat) {
+      setCurrentChat(prev => prev ? {
+        ...prev,
+        messages: [...prev.messages, confirmationMessage]
+      } : null);
+    }
+  };
+
+  const generateDocument = async () => {
+    setDocumentGenState(prev => ({ ...prev, isGenerating: true }));
+
+    // Show generating message
+    const generatingMessage: Message = {
+      role: 'assistant',
+      content: t.generatingDocument,
+      timestamp: new Date().toISOString()
+    };
+
+    if (currentChat) {
+      setCurrentChat(prev => prev ? {
+        ...prev,
+        messages: [...prev.messages, generatingMessage]
+      } : null);
+    }
+
+    try {
+      // Call PDF generation endpoint
+      const { data, error } = await supabase.functions.invoke('generate-document-pdf', {
+        body: {
+          documentType: documentGenState.documentType,
+          documentData: documentGenState.collectedData,
+          language: language
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.pdfUrl) {
+        const successMessage: Message = {
+          role: 'assistant',
+          content: `${t.documentReady}
+
+[${t.downloadPdf}](${data.pdfUrl})
+
+${t.recommendRegisteredMail}`,
+          timestamp: new Date().toISOString()
+        };
+
+        if (currentChat) {
+          setCurrentChat(prev => prev ? {
+            ...prev,
+            messages: [...prev.messages, successMessage]
+          } : null);
+        }
+      }
+    } catch (error) {
+      console.error('Error generating document:', error);
+      toast({
+        title: t.error,
+        description: 'Failed to generate document. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      // Reset document generation state
+      setDocumentGenState({
+        mode: 'chat',
+        currentQuestion: 0,
+        collectedData: {},
+        questions: [],
+        isConfirming: false,
+        isGenerating: false
+      });
+    }
+  };
+
+  const resetDocumentGeneration = () => {
+    setDocumentGenState({
+      mode: 'chat',
+      currentQuestion: 0,
+      collectedData: {},
+      questions: [],
+      isConfirming: false,
+      isGenerating: false
+    });
+
+    const resetMessage: Message = {
+      role: 'assistant',
+      content: 'Хорошо, давайте начнем сначала. Как я могу вам помочь?',
+      timestamp: new Date().toISOString()
+    };
+
+    if (currentChat) {
+      setCurrentChat(prev => prev ? {
+        ...prev,
+        messages: [...prev.messages, resetMessage]
+      } : null);
+    }
+  };
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -165,6 +422,38 @@ export const Chat: React.FC = () => {
     setMessage('');
     setAttachedFiles([]);
     setIsLoading(true);
+
+    // Handle document generation mode
+    if (documentGenState.mode === 'document-generation') {
+      const newUserMessage: Message = {
+        role: 'user',
+        content: userMessage,
+        timestamp: new Date().toISOString()
+      };
+
+      if (currentChat) {
+        setCurrentChat({
+          ...currentChat,
+          messages: [...currentChat.messages, newUserMessage]
+        });
+      }
+
+      // Handle confirmation responses
+      if (documentGenState.isConfirming) {
+        if (userMessage.toLowerCase().includes('да') || userMessage.toLowerCase().includes('yes') || userMessage.toLowerCase().includes('ja') || userMessage.toLowerCase().includes('oui')) {
+          await generateDocument();
+        } else {
+          resetDocumentGeneration();
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      // Handle document answers
+      handleDocumentAnswer(userMessage);
+      setIsLoading(false);
+      return;
+    }
 
     console.log('🌍 Sending message with language:', language);
     console.log('🔧 Request details:', {
@@ -236,6 +525,13 @@ export const Chat: React.FC = () => {
         content: data.response,
         timestamp: new Date().toISOString()
       };
+
+      // Check if AI response contains document generation triggers
+      if (data.response.includes('[DOCUMENT:deposit-letter]')) {
+        setTimeout(() => {
+          enterDocumentMode('deposit-letter');
+        }, 1000);
+      }
 
       if (currentChat) {
         const updatedChat = {

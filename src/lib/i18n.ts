@@ -53,7 +53,33 @@ export const translations = {
     downgrade: 'Downgrade',
     signUpToUpgrade: 'Sign Up to Upgrade',
     takePhoto: 'Take Photo',
-    rentalLawNotice: 'Our application currently works only with rental law questions.\nOther areas of legislation will be added later.\nWe are already training models to expand capabilities.'
+    rentalLawNotice: 'Our application currently works only with rental law questions.\nOther areas of legislation will be added later.\nWe are already training models to expand capabilities.',
+    // Document generation keys
+    documentModeStart: 'Excellent! To prepare this document, I need to ask you 5-6 questions. Please answer them one by one.',
+    confirmData: 'Thank you! Let\'s check everything. Data for the document:',
+    allCorrect: 'Is everything correct?',
+    yesGenerate: 'Yes, generate the document',
+    noNeedCorrection: 'No, needs correction',
+    generatingDocument: 'One moment, preparing your document...',
+    documentReady: 'Your document is ready! You can download it using this link.',
+    downloadPdf: 'Download my document (PDF)',
+    recommendRegisteredMail: 'We recommend sending it by registered mail (aangetekende brief) to have proof of sending.',
+    // Questions for deposit letter
+    questionUserName: 'What is your full name? (First and last name)',
+    questionUserAddress: 'What is your residential address?',
+    questionLandlordName: 'What is the landlord\'s full name?',
+    questionLandlordAddress: 'What is the landlord\'s address?',
+    questionRentalAddress: 'What is the address of the rented property?',
+    questionDepositAmount: 'What is the deposit amount in euros?',
+    questionMoveOutDate: 'What is your move-out date? (DD-MM-YYYY)',
+    // Data labels for confirmation
+    dataUserName: 'Your name',
+    dataUserAddress: 'Your address', 
+    dataLandlordName: 'Landlord name',
+    dataLandlordAddress: 'Landlord address',
+    dataRentalAddress: 'Rental property address',
+    dataDepositAmount: 'Deposit amount',
+    dataMoveOutDate: 'Move-out date'
   },
   nl: {
     title: 'RechtAI',
@@ -108,7 +134,33 @@ export const translations = {
     downgrade: 'Downgraden',
     signUpToUpgrade: 'Registreer om te Upgraden',
     takePhoto: 'Foto Maken',
-    rentalLawNotice: 'Onze applicatie werkt momenteel alleen met vragen over huurrecht.\nAndere rechtsgebieden worden later toegevoegd.\nWe trainen al modellen om de mogelijkheden uit te breiden.'
+    rentalLawNotice: 'Onze applicatie werkt momenteel alleen met vragen over huurrecht.\nAndere rechtsgebieden worden later toegevoegd.\nWe trainen al modellen om de mogelijkheden uit te breiden.',
+    // Document generation keys
+    documentModeStart: 'Uitstekend! Om dit document op te stellen, moet ik je 5-6 vragen stellen. Beantwoord ze één voor één.',
+    confirmData: 'Dank je! Laten we alles controleren. Gegevens voor het document:',
+    allCorrect: 'Klopt alles?',
+    yesGenerate: 'Ja, genereer het document',
+    noNeedCorrection: 'Nee, moet gecorrigeerd worden',
+    generatingDocument: 'Een moment, je document wordt voorbereid...',
+    documentReady: 'Je document is klaar! Je kunt het downloaden via deze link.',
+    downloadPdf: 'Mijn document downloaden (PDF)',
+    recommendRegisteredMail: 'We raden aan het per aangetekende brief te versturen om bewijs van verzending te hebben.',
+    // Questions for deposit letter
+    questionUserName: 'Wat is je volledige naam? (Voor- en achternaam)',
+    questionUserAddress: 'Wat is je woonadres?',
+    questionLandlordName: 'Wat is de volledige naam van de verhuurder?',
+    questionLandlordAddress: 'Wat is het adres van de verhuurder?',
+    questionRentalAddress: 'Wat is het adres van de gehuurde woning?',
+    questionDepositAmount: 'Wat is het bedrag van de borg in euro\'s?',
+    questionMoveOutDate: 'Wat is je verhuisdatum? (DD-MM-JJJJ)',
+    // Data labels for confirmation
+    dataUserName: 'Jouw naam',
+    dataUserAddress: 'Jouw adres',
+    dataLandlordName: 'Verhuurder naam',
+    dataLandlordAddress: 'Verhuurder adres',
+    dataRentalAddress: 'Adres gehuurde woning',
+    dataDepositAmount: 'Borgbedrag',
+    dataMoveOutDate: 'Verhuisdatum'
   },
   ru: {
     title: 'RechtAI',
@@ -163,7 +215,33 @@ export const translations = {
     downgrade: 'Понизить',
     signUpToUpgrade: 'Зарегистрируйтесь для Обновления',
     takePhoto: 'Сделать Фото',
-    rentalLawNotice: 'Наше приложение сейчас работает только с вопросами по арендному праву.\nОстальные разделы законодательства будут добавлены позже.\nМы уже обучаем модели для расширения возможностей.'
+    rentalLawNotice: 'Наше приложение сейчас работает только с вопросами по арендному праву.\nОстальные разделы законодательства будут добавлены позже.\nМы уже обучаем модели для расширения возможностей.',
+    // Document generation keys
+    documentModeStart: 'Отлично! Чтобы составить этот документ, мне нужно задать вам 5-6 вопросов. Пожалуйста, отвечайте на них по одному.',
+    confirmData: 'Спасибо! Давайте все проверим. Данные для документа:',
+    allCorrect: 'Все верно?',
+    yesGenerate: 'Да, все верно, генерируем',
+    noNeedCorrection: 'Нет, нужно исправить',
+    generatingDocument: 'Минутку, готовлю ваш документ...',
+    documentReady: 'Ваш документ готов! Вы можете скачать его по этой ссылке.',
+    downloadPdf: 'Скачать мой документ (PDF)',
+    recommendRegisteredMail: 'Рекомендуем отправить его заказным письмом (aangetekende brief), чтобы у вас было доказательство отправки.',
+    // Questions for deposit letter
+    questionUserName: 'Как вас зовут? (Полное имя и фамилия)',
+    questionUserAddress: 'Ваш адрес проживания?',
+    questionLandlordName: 'Полное имя арендодателя?',
+    questionLandlordAddress: 'Адрес арендодателя?',
+    questionRentalAddress: 'Адрес арендованного жилья?',
+    questionDepositAmount: 'Сумма депозита в евро?',
+    questionMoveOutDate: 'Дата выезда? (ДД-ММ-ГГГГ)',
+    // Data labels for confirmation
+    dataUserName: 'Ваше имя',
+    dataUserAddress: 'Ваш адрес',
+    dataLandlordName: 'Имя арендодателя',
+    dataLandlordAddress: 'Адрес арендодателя',
+    dataRentalAddress: 'Адрес арендованного жилья',
+    dataDepositAmount: 'Сумма депозита',
+    dataMoveOutDate: 'Дата выезда'
   },
   fr: {
     title: 'RechtAI',
@@ -218,7 +296,33 @@ export const translations = {
     downgrade: 'Rétrograder',
     signUpToUpgrade: 'S\'inscrire pour Mettre à Niveau',
     takePhoto: 'Prendre une Photo',
-    rentalLawNotice: 'Notre application ne fonctionne actuellement qu\'avec les questions de droit locatif.\nD\'autres domaines de législation seront ajoutés plus tard.\nNous entraînons déjà des modèles pour élargir les capacités.'
+    rentalLawNotice: 'Notre application ne fonctionne actuellement qu\'avec les questions de droit locatif.\nD\'autres domaines de législation seront ajoutés plus tard.\nNous entraînons déjà des modèles pour élargir les capacités.',
+    // Document generation keys
+    documentModeStart: 'Excellent! Pour préparer ce document, je dois vous poser 5-6 questions. Veuillez y répondre une par une.',
+    confirmData: 'Merci! Vérifions tout. Données pour le document:',
+    allCorrect: 'Tout est correct?',
+    yesGenerate: 'Oui, générer le document',
+    noNeedCorrection: 'Non, besoin de correction',
+    generatingDocument: 'Un instant, préparation de votre document...',
+    documentReady: 'Votre document est prêt! Vous pouvez le télécharger via ce lien.',
+    downloadPdf: 'Télécharger mon document (PDF)',
+    recommendRegisteredMail: 'Nous recommandons de l\'envoyer par courrier recommandé (aangetekende brief) pour avoir une preuve d\'envoi.',
+    // Questions for deposit letter
+    questionUserName: 'Quel est votre nom complet? (Prénom et nom)',
+    questionUserAddress: 'Quelle est votre adresse de résidence?',
+    questionLandlordName: 'Quel est le nom complet du propriétaire?',
+    questionLandlordAddress: 'Quelle est l\'adresse du propriétaire?',
+    questionRentalAddress: 'Quelle est l\'adresse du bien loué?',
+    questionDepositAmount: 'Quel est le montant de la caution en euros?',
+    questionMoveOutDate: 'Quelle est votre date de déménagement? (JJ-MM-AAAA)',
+    // Data labels for confirmation
+    dataUserName: 'Votre nom',
+    dataUserAddress: 'Votre adresse',
+    dataLandlordName: 'Nom du propriétaire',
+    dataLandlordAddress: 'Adresse du propriétaire',
+    dataRentalAddress: 'Adresse du bien loué',
+    dataDepositAmount: 'Montant de la caution',
+    dataMoveOutDate: 'Date de déménagement'
   },
   es: {
     title: 'RechtAI',
@@ -273,7 +377,33 @@ export const translations = {
     downgrade: 'Degradar',
     signUpToUpgrade: 'Regístrate para Actualizar',
     takePhoto: 'Tomar Foto',
-    rentalLawNotice: 'Nuestra aplicación actualmente funciona solo con preguntas de derecho de alquiler.\nOtras áreas de legislación se agregarán más tarde.\nYa estamos entrenando modelos para expandir las capacidades.'
+    rentalLawNotice: 'Nuestra aplicación actualmente funciona solo con preguntas de derecho de alquiler.\nOtras áreas de legislación se agregarán más tarde.\nYa estamos entrenando modelos para expandir las capacidades.',
+    // Document generation keys
+    documentModeStart: '¡Excelente! Para preparar este documento, necesito hacerte 5-6 preguntas. Por favor respóndelas una por una.',
+    confirmData: '¡Gracias! Revisemos todo. Datos para el documento:',
+    allCorrect: '¿Todo está correcto?',
+    yesGenerate: 'Sí, generar el documento',
+    noNeedCorrection: 'No, necesita corrección',
+    generatingDocument: 'Un momento, preparando tu documento...',
+    documentReady: '¡Tu documento está listo! Puedes descargarlo usando este enlace.',
+    downloadPdf: 'Descargar mi documento (PDF)',
+    recommendRegisteredMail: 'Recomendamos enviarlo por correo certificado (aangetekende brief) para tener prueba del envío.',
+    // Questions for deposit letter
+    questionUserName: '¿Cuál es tu nombre completo? (Nombre y apellido)',
+    questionUserAddress: '¿Cuál es tu dirección de residencia?',
+    questionLandlordName: '¿Cuál es el nombre completo del arrendador?',
+    questionLandlordAddress: '¿Cuál es la dirección del arrendador?',
+    questionRentalAddress: '¿Cuál es la dirección de la propiedad alquilada?',
+    questionDepositAmount: '¿Cuál es el monto del depósito en euros?',
+    questionMoveOutDate: '¿Cuál es tu fecha de mudanza? (DD-MM-AAAA)',
+    // Data labels for confirmation
+    dataUserName: 'Tu nombre',
+    dataUserAddress: 'Tu dirección',
+    dataLandlordName: 'Nombre del arrendador',
+    dataLandlordAddress: 'Dirección del arrendador',
+    dataRentalAddress: 'Dirección de la propiedad alquilada',
+    dataDepositAmount: 'Monto del depósito',
+    dataMoveOutDate: 'Fecha de mudanza'
   },
   ar: {
     title: 'RechtAI',
@@ -328,7 +458,33 @@ export const translations = {
     downgrade: 'التراجع',
     signUpToUpgrade: 'التسجيل للترقية',
     takePhoto: 'التقاط صورة',
-    rentalLawNotice: 'يعمل تطبيقنا حاليًا فقط مع أسئلة قانون الإيجار.\nستتم إضافة مجالات أخرى من التشريع لاحقًا.\nنحن ندرب بالفعل نماذج لتوسيع القدرات'
+    rentalLawNotice: 'يعمل تطبيقنا حاليًا فقط مع أسئلة قانون الإيجار.\nستتم إضافة مجالات أخرى من التشريع لاحقًا.\nنحن ندرب بالفعل نماذج لتوسيع القدرات',
+    // Document generation keys
+    documentModeStart: 'ممتاز! لإعداد هذا المستند، أحتاج لطرح 5-6 أسئلة عليك. يرجى الإجابة عليها واحداً تلو الآخر.',
+    confirmData: 'شكراً! دعنا نراجع كل شيء. بيانات المستند:',
+    allCorrect: 'هل كل شيء صحيح؟',
+    yesGenerate: 'نعم، إنشاء المستند',
+    noNeedCorrection: 'لا، يحتاج تصحيح',
+    generatingDocument: 'لحظة، جاري إعداد مستندك...',
+    documentReady: 'مستندك جاهز! يمكنك تحميله باستخدام هذا الرابط.',
+    downloadPdf: 'تحميل مستندي (PDF)',
+    recommendRegisteredMail: 'نوصي بإرساله بالبريد المسجل (aangetekende brief) للحصول على إثبات الإرسال.',
+    // Questions for deposit letter
+    questionUserName: 'ما هو اسمك الكامل؟ (الاسم الأول والعائلة)',
+    questionUserAddress: 'ما هو عنوان إقامتك؟',
+    questionLandlordName: 'ما هو الاسم الكامل لمالك العقار؟',
+    questionLandlordAddress: 'ما هو عنوان مالك العقار؟',
+    questionRentalAddress: 'ما هو عنوان العقار المؤجر؟',
+    questionDepositAmount: 'ما هو مبلغ التأمين باليورو؟',
+    questionMoveOutDate: 'ما هو تاريخ انتقالك؟ (يوم-شهر-سنة)',
+    // Data labels for confirmation
+    dataUserName: 'اسمك',
+    dataUserAddress: 'عنوانك',
+    dataLandlordName: 'اسم مالك العقار',
+    dataLandlordAddress: 'عنوان مالك العقار',
+    dataRentalAddress: 'عنوان العقار المؤجر',
+    dataDepositAmount: 'مبلغ التأمين',
+    dataMoveOutDate: 'تاريخ الانتقال'
   },
   pl: {
     title: 'RechtAI',
@@ -383,7 +539,33 @@ export const translations = {
     downgrade: 'Degraduj',
     signUpToUpgrade: 'Zarejestruj się aby Uaktualnić',
     takePhoto: 'Zrób Zdjęcie',
-    rentalLawNotice: 'Nasza aplikacja obecnie działa tylko z pytaniami dotyczącymi prawa najmu.\nInne obszary legislacji zostaną dodane później.\nJuż trenujemy modele, aby rozszerzyć możliwości.'
+    rentalLawNotice: 'Nasza aplikacja obecnie działa tylko z pytaniami dotyczącymi prawa najmu.\nInne obszary legislacji zostaną dodane później.\nJuż trenujemy modele, aby rozszerzyć możliwości.',
+    // Document generation keys
+    documentModeStart: 'Doskonale! Aby przygotować ten dokument, muszę zadać Ci 5-6 pytań. Proszę odpowiadaj na nie jeden po drugim.',
+    confirmData: 'Dziękuję! Sprawdźmy wszystko. Dane do dokumentu:',
+    allCorrect: 'Czy wszystko jest poprawne?',
+    yesGenerate: 'Tak, generuj dokument',
+    noNeedCorrection: 'Nie, trzeba poprawić',
+    generatingDocument: 'Moment, przygotowuję Twój dokument...',
+    documentReady: 'Twój dokument jest gotowy! Możesz go pobrać używając tego linku.',
+    downloadPdf: 'Pobierz mój dokument (PDF)',
+    recommendRegisteredMail: 'Zalecamy wysłanie go listem poleconym (aangetekende brief), aby mieć dowód wysłania.',
+    // Questions for deposit letter
+    questionUserName: 'Jak się nazywasz? (Imię i nazwisko)',
+    questionUserAddress: 'Jaki jest Twój adres zamieszkania?',
+    questionLandlordName: 'Jakie jest pełne imię i nazwisko wynajmującego?',
+    questionLandlordAddress: 'Jaki jest adres wynajmującego?',
+    questionRentalAddress: 'Jaki jest adres wynajmowanej nieruchomości?',
+    questionDepositAmount: 'Jaka jest kwota kaucji w euro?',
+    questionMoveOutDate: 'Jaka jest data Twojej przeprowadzki? (DD-MM-RRRR)',
+    // Data labels for confirmation
+    dataUserName: 'Twoje imię',
+    dataUserAddress: 'Twój adres',
+    dataLandlordName: 'Imię wynajmującego',
+    dataLandlordAddress: 'Adres wynajmującego',
+    dataRentalAddress: 'Adres wynajmowanej nieruchomości',
+    dataDepositAmount: 'Kwota kaucji',
+    dataMoveOutDate: 'Data przeprowadzki'
   },
   de: {
     title: 'RechtAI',
@@ -438,7 +620,33 @@ export const translations = {
     downgrade: 'Downgrade',
     signUpToUpgrade: 'Registrieren zum Upgraden',
     takePhoto: 'Foto Aufnehmen',
-    rentalLawNotice: 'Unsere Anwendung funktioniert derzeit nur mit Fragen zum Mietrecht.\nAndere Gesetzgebungsbereiche werden später hinzugefügt.\nWir trainieren bereits Modelle, um die Möglichkeiten zu erweitern.'
+    rentalLawNotice: 'Unsere Anwendung funktioniert derzeit nur mit Fragen zum Mietrecht.\nAndere Gesetzgebungsbereiche werden später hinzugefügt.\nWir trainieren bereits Modelle, um die Möglichkeiten zu erweitern.',
+    // Document generation keys
+    documentModeStart: 'Ausgezeichnet! Um dieses Dokument zu erstellen, muss ich Ihnen 5-6 Fragen stellen. Bitte beantworten Sie sie nacheinander.',
+    confirmData: 'Danke! Lassen Sie uns alles überprüfen. Daten für das Dokument:',
+    allCorrect: 'Ist alles korrekt?',
+    yesGenerate: 'Ja, Dokument generieren',
+    noNeedCorrection: 'Nein, muss korrigiert werden',
+    generatingDocument: 'Einen Moment, Ihr Dokument wird vorbereitet...',
+    documentReady: 'Ihr Dokument ist fertig! Sie können es über diesen Link herunterladen.',
+    downloadPdf: 'Mein Dokument herunterladen (PDF)',
+    recommendRegisteredMail: 'Wir empfehlen es per Einschreiben (aangetekende brief) zu versenden, um einen Sendungsnachweis zu haben.',
+    // Questions for deposit letter
+    questionUserName: 'Wie ist Ihr vollständiger Name? (Vor- und Nachname)',
+    questionUserAddress: 'Wie lautet Ihre Wohnadresse?',
+    questionLandlordName: 'Wie ist der vollständige Name des Vermieters?',
+    questionLandlordAddress: 'Wie lautet die Adresse des Vermieters?',
+    questionRentalAddress: 'Wie lautet die Adresse der Mietwohnung?',
+    questionDepositAmount: 'Wie hoch ist die Kaution in Euro?',
+    questionMoveOutDate: 'Was ist Ihr Auszugsdatum? (TT-MM-JJJJ)',
+    // Data labels for confirmation
+    dataUserName: 'Ihr Name',
+    dataUserAddress: 'Ihre Adresse',
+    dataLandlordName: 'Name des Vermieters',
+    dataLandlordAddress: 'Adresse des Vermieters',
+    dataRentalAddress: 'Adresse der Mietwohnung',
+    dataDepositAmount: 'Kautionsbetrag',
+    dataMoveOutDate: 'Auszugsdatum'
   }
 };
 

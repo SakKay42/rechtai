@@ -227,3 +227,84 @@ export async function processN8NCalls(aiResponse: string, language: string): Pro
   console.log(`📊 N8N processing complete: ${callCount} calls processed`);
   return processedResponse;
 }
+
+// PDF Generation function for document creation
+export async function generateDocumentPDF(documentData: any, documentType: string, language: string): Promise<{pdfUrl: string, success: boolean}> {
+  const n8nPdfWebhookUrl = Deno.env.get('N8N_PDF_WEBHOOK_URL');
+  
+  if (!n8nPdfWebhookUrl) {
+    throw new Error('PDF generation service not configured');
+  }
+
+  // Validate webhook URL format
+  try {
+    new URL(n8nPdfWebhookUrl);
+  } catch {
+    throw new Error('Invalid PDF generation service configuration');
+  }
+
+  try {
+    console.log('🔄 Generating PDF document:', {
+      documentType,
+      language,
+      dataKeys: Object.keys(documentData)
+    });
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout for PDF generation
+
+    const response = await fetch(n8nPdfWebhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Supabase-Edge-Function/1.0'
+      },
+      body: JSON.stringify({
+        documentType,
+        documentData,
+        language,
+        timestamp: new Date().toISOString()
+      }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Unknown error');
+      throw new Error(`PDF generation failed: ${response.status} ${response.statusText} - ${errorText}`);
+    }
+
+    // Validate content type
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Invalid response from PDF generation service');
+    }
+
+    const result = await response.json();
+    
+    // Enhanced response validation
+    if (!result || typeof result !== 'object') {
+      throw new Error('Invalid response format from PDF generation service');
+    }
+
+    if (!result.pdfUrl || typeof result.pdfUrl !== 'string') {
+      throw new Error('PDF generation failed - no download URL received');
+    }
+
+    console.log('✅ PDF generated successfully');
+    return {
+      pdfUrl: result.pdfUrl,
+      success: true
+    };
+
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.error('PDF generation timeout');
+      throw new Error('PDF generation timeout - please try again');
+    }
+    
+    console.error('PDF generation error:', error);
+    throw new Error('Failed to generate PDF document');
+  }
+}
