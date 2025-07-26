@@ -84,7 +84,14 @@ export const Chat: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = messagesEndRef.current?.parentElement;
+    if (container) {
+      // Only scroll if user is near the bottom (within 100px)
+      const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+      if (isNearBottom) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }
   };
 
   useEffect(() => {
@@ -610,7 +617,16 @@ ${t.recommendRegisteredMail}`,
   }
 
   return (
-    <div className="h-full flex gap-4 p-4 pointer-events-auto">
+    <div className="h-full flex gap-4 p-4 relative">
+      <style>{`
+        .chat-container {
+          position: relative;
+          overflow-anchor: none;
+          touch-action: pan-y;
+          -webkit-overflow-scrolling: touch;
+          overscroll-behavior: contain;
+        }
+      `}</style>
       <div className="flex gap-4 h-full w-full">
         {/* Desktop Chat History Sidebar */}
         {!isMobile && (
@@ -627,7 +643,7 @@ ${t.recommendRegisteredMail}`,
                 </Button>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="h-[calc(100%-4rem)] overflow-y-auto pointer-events-auto">
+                <div className="h-[calc(100%-4rem)] overflow-y-auto chat-container">
                   <div className="p-4 space-y-2">
                     {chatHistory.map((chat) => (
                       <Button
@@ -683,7 +699,7 @@ ${t.recommendRegisteredMail}`,
                             <Plus className="h-4 w-4 mr-2" />
                             {t.startChat}
                           </Button>
-                          <div className="h-[calc(100vh-14rem)] overflow-y-auto pointer-events-auto">
+                          <div className="h-[calc(100vh-14rem)] overflow-y-auto chat-container">
                             <div className="space-y-2">
                               {chatHistory.map((chat) => (
                                 <Button
@@ -731,7 +747,7 @@ ${t.recommendRegisteredMail}`,
             <CardContent className="flex-1 flex flex-col p-0 min-h-0">
               {/* Messages Area */}
               <div className="flex-1 min-h-0 relative">
-                <div className="h-full overflow-y-auto p-4 pointer-events-auto">
+                <div className="h-full overflow-y-auto p-4 chat-container">
                   {currentChat?.messages.length ? (
                     <div className="space-y-4">
                       {currentChat.messages.map((msg, index) => (

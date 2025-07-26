@@ -301,7 +301,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </header>
       
-      <main className={`dark:bg-gray-900 dark:text-white touch-manipulation ${location.pathname === '/chat' ? 'h-[calc(100vh-5rem)] overflow-hidden' : 'overflow-hidden'}`}>
+      <main className={`dark:bg-gray-900 dark:text-white touch-manipulation flex flex-col ${location.pathname === '/chat' ? 'h-[calc(100vh-4rem)] overflow-hidden' : 'overflow-auto'}`}>
         {children}
       </main>
     </div>
