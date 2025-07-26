@@ -11,7 +11,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Send, Loader2, Globe, History, Plus } from 'lucide-react';
-import { FileUpload, FileAttachment } from '@/components/chat/FileUpload';
+import { FileAttachmentMenu } from '@/components/chat/FileAttachmentMenu';
+import { FileAttachment } from '@/components/chat/FileUpload';
 import { MessageAttachments } from '@/components/chat/MessageAttachments';
 
 interface Message {
@@ -482,16 +483,13 @@ export const Chat: React.FC = () => {
 
               {/* Message Input */}
               <div className="border-t dark:border-gray-700 p-4 flex-shrink-0">
-                <div className="space-y-3">
-                  {/* File Upload */}
-                  <FileUpload 
-                    onFilesChange={setAttachedFiles}
-                    attachedFiles={attachedFiles}
-                    sessionId={currentChat?.id}
-                  />
-                  
-                  {/* Message Form */}
-                  <form onSubmit={handleSendMessage} className="flex gap-2">
+                {/* Message Form */}
+                <form onSubmit={handleSendMessage} className="flex gap-2 items-end">
+                    <FileAttachmentMenu 
+                      onFilesChange={setAttachedFiles}
+                      attachedFiles={attachedFiles}
+                      sessionId={currentChat?.id}
+                    />
                     <Input
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
@@ -512,11 +510,10 @@ export const Chat: React.FC = () => {
                     </Button>
                   </form>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
