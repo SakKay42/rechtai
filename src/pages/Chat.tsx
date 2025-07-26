@@ -631,7 +631,7 @@ ${t.recommendRegisteredMail}`,
                 </Button>
               </CardHeader>
               <CardContent className="p-0">
-                <ScrollArea className="h-[calc(100vh-16rem)] overflow-y-auto">
+                <ScrollArea className="h-[calc(100vh-16rem)]">
                   <div className="p-4 space-y-2">
                     {chatHistory.map((chat) => (
                       <Button
@@ -687,7 +687,7 @@ ${t.recommendRegisteredMail}`,
                             <Plus className="h-4 w-4 mr-2" />
                             {t.startChat}
                           </Button>
-                          <ScrollArea className="h-[calc(100vh-14rem)] overflow-y-auto">
+                          <ScrollArea className="h-[calc(100vh-14rem)]">
                             <div className="space-y-2">
                               {chatHistory.map((chat) => (
                                 <Button
@@ -735,7 +735,7 @@ ${t.recommendRegisteredMail}`,
             <CardContent className="flex-1 flex flex-col p-0 min-h-0">
               {/* Messages Area */}
               <div className="flex-1 min-h-0">
-                <ScrollArea className="h-[calc(100vh-12rem)] overflow-y-auto p-4">
+                <ScrollArea className="h-[calc(100vh-12rem)] p-4">
                   {currentChat?.messages.length ? (
                     <div className="space-y-4">
                       {currentChat.messages.map((msg, index) => (
