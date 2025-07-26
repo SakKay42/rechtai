@@ -88,28 +88,10 @@ export const Home: React.FC = () => {
 
       {/* CTA Section */}
       <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-2xl p-12">
-        <h2 className="text-3xl font-bold text-foreground mb-4">
-          {t.getHelp}
-        </h2>
-        <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-          {t.description}
-        </p>
-        
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button 
-            size="lg" 
-            className="bg-[#FF6600] hover:bg-[#FF6600]/90"
-            onClick={handleStartChat}
-          >
-            {t.startChat}
-          </Button>
-          <Button 
-            size="lg" 
-            variant="outline"
-            onClick={() => navigate('/pricing')}
-          >
-            {t.pricing}
-          </Button>
+        <div className="max-w-3xl mx-auto">
+          <div className="text-lg text-foreground leading-relaxed whitespace-pre-line">
+            {t.rentalLawNotice}
+          </div>
         </div>
       </div>
     </div>

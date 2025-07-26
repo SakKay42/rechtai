@@ -52,7 +52,8 @@ export const translations = {
     upgradeNow: 'Upgrade Now',
     downgrade: 'Downgrade',
     signUpToUpgrade: 'Sign Up to Upgrade',
-    takePhoto: 'Take Photo'
+    takePhoto: 'Take Photo',
+    rentalLawNotice: 'Our application currently works only with rental law questions.\nOther areas of legislation will be added later.\nWe are already training models to expand capabilities'
   },
   nl: {
     title: 'RechtAI',
@@ -106,7 +107,8 @@ export const translations = {
     upgradeNow: 'Nu Upgraden',
     downgrade: 'Downgraden',
     signUpToUpgrade: 'Registreer om te Upgraden',
-    takePhoto: 'Foto Maken'
+    takePhoto: 'Foto Maken',
+    rentalLawNotice: 'Onze applicatie werkt momenteel alleen met vragen over huurrecht.\nAndere rechtsgebieden worden later toegevoegd.\nWe trainen al modellen om de mogelijkheden uit te breiden'
   },
   ru: {
     title: 'RechtAI',
@@ -160,7 +162,8 @@ export const translations = {
     upgradeNow: 'Обновить Сейчас',
     downgrade: 'Понизить',
     signUpToUpgrade: 'Зарегистрируйтесь для Обновления',
-    takePhoto: 'Сделать Фото'
+    takePhoto: 'Сделать Фото',
+    rentalLawNotice: 'Наше приложение сейчас работает только с вопросами по арендному праву.\nОстальные разделы законодательства будут добавлены позже.\nМы уже обучаем модели для расширения возможностей'
   },
   fr: {
     title: 'RechtAI',
@@ -214,7 +217,8 @@ export const translations = {
     upgradeNow: 'Mettre à Niveau',
     downgrade: 'Rétrograder',
     signUpToUpgrade: 'S\'inscrire pour Mettre à Niveau',
-    takePhoto: 'Prendre une Photo'
+    takePhoto: 'Prendre une Photo',
+    rentalLawNotice: 'Notre application ne fonctionne actuellement qu\'avec les questions de droit locatif.\nD\'autres domaines de législation seront ajoutés plus tard.\nNous entraînons déjà des modèles pour élargir les capacités'
   },
   es: {
     title: 'RechtAI',
@@ -268,7 +272,8 @@ export const translations = {
     upgradeNow: 'Actualizar Ahora',
     downgrade: 'Degradar',
     signUpToUpgrade: 'Regístrate para Actualizar',
-    takePhoto: 'Tomar Foto'
+    takePhoto: 'Tomar Foto',
+    rentalLawNotice: 'Nuestra aplicación actualmente funciona solo con preguntas de derecho de alquiler.\nOtras áreas de legislación se agregarán más tarde.\nYa estamos entrenando modelos para expandir las capacidades'
   },
   ar: {
     title: 'RechtAI',
@@ -322,7 +327,8 @@ export const translations = {
     upgradeNow: 'الترقية الآن',
     downgrade: 'التراجع',
     signUpToUpgrade: 'التسجيل للترقية',
-    takePhoto: 'التقاط صورة'
+    takePhoto: 'التقاط صورة',
+    rentalLawNotice: 'يعمل تطبيقنا حاليًا فقط مع أسئلة قانون الإيجار.\nستتم إضافة مجالات أخرى من التشريع لاحقًا.\nنحن ندرب بالفعل نماذج لتوسيع القدرات'
   },
   pl: {
     title: 'RechtAI',
@@ -376,7 +382,8 @@ export const translations = {
     upgradeNow: 'Uaktualnij Teraz',
     downgrade: 'Degraduj',
     signUpToUpgrade: 'Zarejestruj się aby Uaktualnić',
-    takePhoto: 'Zrób Zdjęcie'
+    takePhoto: 'Zrób Zdjęcie',
+    rentalLawNotice: 'Nasza aplikacja obecnie działa tylko z pytaniami dotyczącymi prawa najmu.\nInne obszary legislacji zostaną dodane później.\nJuż trenujemy modele, aby rozszerzyć możliwości'
   },
   de: {
     title: 'RechtAI',
@@ -430,7 +437,8 @@ export const translations = {
     upgradeNow: 'Jetzt Upgraden',
     downgrade: 'Downgrade',
     signUpToUpgrade: 'Registrieren zum Upgraden',
-    takePhoto: 'Foto Aufnehmen'
+    takePhoto: 'Foto Aufnehmen',
+    rentalLawNotice: 'Unsere Anwendung funktioniert derzeit nur mit Fragen zum Mietrecht.\nAndere Gesetzgebungsbereiche werden später hinzugefügt.\nWir trainieren bereits Modelle, um die Möglichkeiten zu erweitern'
   }
 };
 
