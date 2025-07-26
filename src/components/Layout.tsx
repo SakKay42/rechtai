@@ -229,9 +229,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     >
                       {getUserDisplayName()}
                     </span>
-                    <Button variant="outline" onClick={handleSignOut}>
-                      <DoorClosed className="h-4 w-4 mr-2 text-muted-foreground" />
-                      {t.logout}
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={handleSignOut}
+                      className="h-9 w-9"
+                      aria-label="Logout"
+                    >
+                      <DoorClosed className="h-4 w-4 text-muted-foreground" />
                     </Button>
                   </div>
                 ) : (
