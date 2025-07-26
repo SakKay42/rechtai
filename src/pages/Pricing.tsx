@@ -1,12 +1,17 @@
 
 import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check } from 'lucide-react';
 
 export const Pricing: React.FC = () => {
   const { t } = useLanguage();
+  const { profile, user } = useAuth();
+
+  // Determine current plan based on user's premium status
+  const currentPlan = profile?.is_premium ? 'premium' : 'free';
 
   const plans = [
     {
@@ -18,8 +23,10 @@ export const Pricing: React.FC = () => {
         'Basic support',
         'Multi-language interface'
       ],
-      cta: 'Current Plan',
-      disabled: true
+      cta: currentPlan === 'free' ? 'Current Plan' : 'Downgrade',
+      disabled: currentPlan === 'free' || !user,
+      isCurrentPlan: currentPlan === 'free',
+      planType: 'free'
     },
     {
       name: t.premium,
@@ -32,9 +39,11 @@ export const Pricing: React.FC = () => {
         'Priority support',
         'Advanced AI features'
       ],
-      cta: 'Upgrade Now',
-      disabled: false,
-      popular: true
+      cta: currentPlan === 'premium' ? 'Current Plan' : (user ? 'Upgrade Now' : 'Sign Up to Upgrade'),
+      disabled: currentPlan === 'premium',
+      isCurrentPlan: currentPlan === 'premium',
+      popular: currentPlan !== 'premium', // Only show popular badge if not current plan
+      planType: 'premium'
     }
   ];
 
@@ -53,9 +62,22 @@ export const Pricing: React.FC = () => {
         {plans.map((plan, index) => (
           <Card 
             key={index} 
-            className={`relative border-2 ${plan.popular ? 'border-[#FF6600] shadow-lg' : 'border-gray-200 dark:border-gray-700'}`}
+            className={`relative border-2 ${
+              plan.isCurrentPlan 
+                ? 'border-[#FF6600] shadow-lg bg-[#FF6600]/5' 
+                : plan.popular 
+                  ? 'border-[#FF6600] shadow-lg' 
+                  : 'border-gray-200 dark:border-gray-700'
+            }`}
           >
-            {plan.popular && (
+            {plan.isCurrentPlan && (
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                <span className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+                  Your Current Plan
+                </span>
+              </div>
+            )}
+            {plan.popular && !plan.isCurrentPlan && (
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                 <span className="bg-[#FF6600] text-white px-4 py-1 rounded-full text-sm font-medium">
                   Popular
