@@ -239,10 +239,10 @@ export const FileAttachmentMenu: React.FC<FileAttachmentMenuProps> = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            className="relative bg-[#FF6600] hover:bg-[#E55A00] text-white h-10 w-10 p-0 rounded border-0"
+            className="relative bg-transparent hover:bg-transparent text-[#FF6600] hover:text-[#E55A00] h-10 w-10 p-0 border-0 transition-colors"
             disabled={isUploading}
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-8 w-8" />
             {attachedFiles.length > 0 && (
               <Badge
                 variant="destructive"
