@@ -556,10 +556,6 @@ ${t.recommendRegisteredMail}`,
         setSearchParams({ id: newChat.id });
       }
 
-      toast({
-        title: t.messageSent || 'Message sent',
-        description: t.aiResponseReceived || 'AI response received'
-      });
 
     } catch (error: any) {
       console.error('💥 Complete error details:', {
