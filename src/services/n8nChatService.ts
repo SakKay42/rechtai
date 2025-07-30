@@ -21,7 +21,7 @@ interface N8NChatResponse {
   type?: string;
 }
 
-const N8N_WEBHOOK_URL = "https://primary-production-90b2.up.railway.app/webhook-test/b76bdc69-7e22-42f4-95a6-f84e85add767";
+const N8N_WEBHOOK_URL = "https://primary-production-90b2.up.railway.app/webhook/b76bdc69-7e22-42f4-95a6-f84e85add767";
 
 export class N8NChatService {
   private static async makeRequest(data: N8NChatRequest): Promise<N8NChatResponse> {
