@@ -7,7 +7,9 @@ import { Loader2, Send, User, Bot } from 'lucide-react';
 import { toast } from 'sonner';
 import { FileAttachmentMenu } from '@/components/chat/FileAttachmentMenu';
 import { MessageAttachments } from '@/components/chat/MessageAttachments';
+import { ChatSidebar } from '@/components/chat/ChatSidebar';
 import { N8NChatService, type N8NMessage, type FileAttachment } from '@/services/n8nChatService';
+import { ChatSessionService } from '@/services/chatSessionService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -18,6 +20,7 @@ export const Chat = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<FileAttachment[]>([]);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const sessionId = useRef(crypto.randomUUID());
 
@@ -29,12 +32,63 @@ export const Chat = () => {
     scrollToBottom();
   }, [messages]);
 
+  const createNewSession = async () => {
+    if (!user) return;
+    
+    try {
+      const newSessionId = await ChatSessionService.createSession(
+        'New Chat',
+        language,
+        user.id
+      );
+      setCurrentSessionId(newSessionId);
+      sessionId.current = newSessionId as any;
+      setMessages([]);
+      setInput('');
+      setAttachedFiles([]);
+    } catch (error) {
+      console.error('Error creating session:', error);
+      toast.error('Failed to create new chat');
+    }
+  };
+
+  const loadSession = async (sessionIdToLoad: string) => {
+    try {
+      const session = await ChatSessionService.getSession(sessionIdToLoad);
+      if (session) {
+        setCurrentSessionId(sessionIdToLoad);
+        sessionId.current = sessionIdToLoad as any;
+        setMessages(session.messages);
+        setInput('');
+        setAttachedFiles([]);
+      }
+    } catch (error) {
+      console.error('Error loading session:', error);
+      toast.error('Failed to load chat');
+    }
+  };
+
+  const saveCurrentSession = async () => {
+    if (currentSessionId && messages.length > 0) {
+      try {
+        await ChatSessionService.updateSessionMessages(currentSessionId, messages);
+      } catch (error) {
+        console.error('Error saving session:', error);
+      }
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!input.trim() && attachedFiles.length === 0) return;
     
     if (!user) {
       toast.error(t.signInToChat);
       return;
+    }
+
+    // Create new session if none exists
+    if (!currentSessionId) {
+      await createNewSession();
     }
 
     const userMessage: N8NMessage = {
@@ -63,7 +117,13 @@ export const Chat = () => {
         timestamp: new Date(),
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      const updatedMessages = [...messages, userMessage, assistantMessage];
+      setMessages(updatedMessages);
+      
+      // Save to database
+      if (currentSessionId) {
+        await ChatSessionService.updateSessionMessages(currentSessionId, updatedMessages);
+      }
     } catch (error) {
       console.error('Chat error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to send message');
@@ -80,7 +140,18 @@ export const Chat = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen w-full">
+    <div className="flex h-screen w-full">
+      <ChatSidebar
+        currentSessionId={currentSessionId}
+        onSessionSelect={loadSession}
+        onNewChat={createNewSession}
+        onClearAllHistory={() => {
+          setMessages([]);
+          setCurrentSessionId(null);
+          sessionId.current = crypto.randomUUID();
+        }}
+      />
+      
       <div className="flex-1 flex flex-col bg-background">
         <div className="p-6 border-b border-border bg-card">
           <h1 className="text-2xl font-bold text-foreground">{t.chatTitle}</h1>
