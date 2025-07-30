@@ -331,6 +331,27 @@ export type Database = {
         }
         Relationships: []
       }
+      Webhooks: {
+        Row: {
+          created_at: string
+          id: number
+          name: string | null
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          name?: string | null
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          name?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
