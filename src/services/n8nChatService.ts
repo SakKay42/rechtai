@@ -20,7 +20,7 @@ interface N8NRequest {
 }
 
 interface N8NResponse {
-  response: string;
+  output: string;
   error?: string;
 }
 
@@ -73,7 +73,7 @@ export class N8NChatService {
       throw new Error(response.error);
     }
 
-    return response.response;
+    return response.output;
   }
 }
 

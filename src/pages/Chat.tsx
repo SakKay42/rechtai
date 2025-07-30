@@ -77,16 +77,16 @@ export const Chat = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] max-w-4xl mx-auto p-4">
-      <Card className="flex-1 flex flex-col">
-        <div className="p-4 border-b">
-          <h1 className="text-xl font-semibold">RechtAI Chat</h1>
-          <p className="text-sm text-muted-foreground">
+    <div className="flex flex-col h-screen w-full">
+      <div className="flex-1 flex flex-col bg-background">
+        <div className="p-6 border-b border-border bg-card">
+          <h1 className="text-2xl font-bold text-foreground">RechtAI Chat</h1>
+          <p className="text-base text-muted-foreground">
             Ask questions about Dutch law and get AI-powered legal guidance
           </p>
         </div>
 
-        <ScrollArea className="flex-1 p-4">
+        <ScrollArea className="flex-1 p-6">
           <div className="space-y-4">
             {messages.length === 0 && (
               <div className="text-center text-muted-foreground py-8">
@@ -153,7 +153,7 @@ export const Chat = () => {
           <div ref={messagesEndRef} />
         </ScrollArea>
 
-        <div className="p-4 border-t">
+        <div className="p-6 border-t border-border bg-card">
           {attachedFiles.length > 0 && (
             <div className="mb-3">
               <MessageAttachments attachments={attachedFiles} />
@@ -189,7 +189,7 @@ export const Chat = () => {
             </Button>
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 };
