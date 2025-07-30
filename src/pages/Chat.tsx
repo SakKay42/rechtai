@@ -9,9 +9,11 @@ import { FileAttachmentMenu } from '@/components/chat/FileAttachmentMenu';
 import { MessageAttachments } from '@/components/chat/MessageAttachments';
 import { N8NChatService, type N8NMessage, type FileAttachment } from '@/services/n8nChatService';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const Chat = () => {
   const { user } = useAuth();
+  const { language, t } = useLanguage();
   const [messages, setMessages] = useState<N8NMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +33,7 @@ export const Chat = () => {
     if (!input.trim() && attachedFiles.length === 0) return;
     
     if (!user) {
-      toast.error('Please sign in to use the chat');
+      toast.error(t.signInToChat);
       return;
     }
 
@@ -51,7 +53,8 @@ export const Chat = () => {
       const response = await N8NChatService.sendMessage(
         input,
         attachedFiles.length > 0 ? attachedFiles : undefined,
-        sessionId.current
+        sessionId.current,
+        language
       );
 
       const assistantMessage: N8NMessage = {
@@ -80,9 +83,9 @@ export const Chat = () => {
     <div className="flex flex-col h-screen w-full">
       <div className="flex-1 flex flex-col bg-background">
         <div className="p-6 border-b border-border bg-card">
-          <h1 className="text-2xl font-bold text-foreground">RechtAI Chat</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t.chatTitle}</h1>
           <p className="text-base text-muted-foreground">
-            Ask questions about Dutch law and get AI-powered legal guidance
+            {t.chatSubtitle}
           </p>
         </div>
 
@@ -91,7 +94,7 @@ export const Chat = () => {
             {messages.length === 0 && (
               <div className="text-center text-muted-foreground py-8">
                 <Bot className="mx-auto mb-4 h-12 w-12 opacity-50" />
-                <p>Start a conversation by asking a legal question</p>
+                <p>{t.startConversation}</p>
               </div>
             )}
 
@@ -144,7 +147,7 @@ export const Chat = () => {
                 <div className="bg-muted p-3 rounded-lg">
                   <div className="flex items-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Thinking...</span>
+                    <span>{t.thinking}</span>
                   </div>
                 </div>
               </div>
@@ -171,7 +174,7 @@ export const Chat = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Ask a legal question..."
+              placeholder={t.askLegalQuestion}
               disabled={isLoading}
               className="flex-1"
             />

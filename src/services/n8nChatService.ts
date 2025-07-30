@@ -17,6 +17,7 @@ interface N8NRequest {
   message: string;
   attachments?: FileAttachment[];
   sessionId?: string;
+  language?: string;
 }
 
 interface N8NResponse {
@@ -59,12 +60,14 @@ export class N8NChatService {
   static async sendMessage(
     message: string,
     attachments?: FileAttachment[],
-    sessionId?: string
+    sessionId?: string,
+    language?: string
   ): Promise<string> {
     const request: N8NRequest = {
       message,
       attachments,
       sessionId,
+      language,
     };
 
     const response = await this.makeRequest(request);
