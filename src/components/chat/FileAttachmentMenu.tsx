@@ -97,13 +97,13 @@ export const FileAttachmentMenu: React.FC<FileAttachmentMenuProps> = ({
         const filePath = `${folderPath}/${fileName}`;
 
         const { data, error } = await supabase.storage
-          .from('chat-attachments')
+          .from('chat-files')
           .upload(filePath, file);
 
         if (error) throw error;
 
         const { data: { publicUrl } } = supabase.storage
-          .from('chat-attachments')
+          .from('chat-files')
           .getPublicUrl(filePath);
 
         return {
