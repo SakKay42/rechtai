@@ -1,6 +1,7 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import * as prompts from './utils/prompts.ts'; // сохраняет prompts.ts в сборке
 import { corsHeaders } from './utils/cors.ts'
 import { validateInput } from './utils/validation.ts'
 import { generateChatResponse } from './utils/n8n.ts'
