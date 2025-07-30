@@ -14,6 +14,7 @@ import { Send, Loader2, Globe, History, Plus } from 'lucide-react';
 import { FileAttachmentMenu } from '@/components/chat/FileAttachmentMenu';
 import { FileAttachment } from '@/components/chat/FileUpload';
 import { MessageAttachments } from '@/components/chat/MessageAttachments';
+import { N8NChatService } from '@/services/n8nChatService';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -485,32 +486,20 @@ ${t.recommendRegisteredMail}`,
         });
       }
 
-      console.log('📡 Calling Edge Function...');
+      console.log('📡 Calling N8N webhook...');
       
-      const { data, error } = await supabase.functions.invoke('chat-with-ai', {
-        body: {
-          message: userMessage,
-          chatId: currentChat?.id,
-          language: language,
-          attachments: messageAttachments
-        }
-      });
+      const data = await N8NChatService.sendMessage(
+        userMessage,
+        user?.id || '',
+        language,
+        currentChat?.id,
+        messageAttachments
+      );
 
-      if (error) {
-        console.error('❌ Supabase function error:', {
-          error,
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code
-        });
-        throw error;
-      }
-
-      console.log('✅ Edge Function response:', data);
+      console.log('✅ N8N response:', data);
 
       if (data?.error) {
-        console.error('❌ Application error from Edge Function:', data.error);
+        console.error('❌ Application error from N8N:', data.error);
         if (data.type === 'LIMIT_REACHED') {
           toast({
             title: t.chatLimitReached || 'Chat limit reached',
@@ -523,7 +512,7 @@ ${t.recommendRegisteredMail}`,
       }
 
       if (!data?.response) {
-        console.error('❌ Missing response from Edge Function:', data);
+        console.error('❌ Missing response from N8N:', data);
         throw new Error('No response received from AI service');
       }
 
@@ -552,7 +541,7 @@ ${t.recommendRegisteredMail}`,
         ));
       } else {
         const newChat: ChatSession = {
-          id: data.chatId,
+          id: data.chatId || `chat-${Date.now()}`,
           title: userMessage.length > 50 ? userMessage.substring(0, 50) + '...' : userMessage,
           messages: [newUserMessage, aiMessage],
           created_at: new Date().toISOString()
