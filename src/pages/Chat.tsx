@@ -10,7 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Send, Loader2, Globe, History, Plus } from 'lucide-react';
+import { Send, Loader2, Globe, History, Plus, X, Trash2 } from 'lucide-react';
 import { FileAttachmentMenu } from '@/components/chat/FileAttachmentMenu';
 import { FileAttachment } from '@/components/chat/FileUpload';
 import { MessageAttachments } from '@/components/chat/MessageAttachments';
@@ -126,8 +126,7 @@ export const Chat: React.FC = () => {
         .from('chat_sessions')
         .select('*')
         .eq('user_id', user?.id)
-        .order('updated_at', { ascending: false })
-        .limit(10);
+        .order('updated_at', { ascending: false });
 
       if (error) throw error;
       
@@ -192,6 +191,74 @@ export const Chat: React.FC = () => {
     setCurrentChat(chat);
     setSearchParams({ id: chat.id });
     setIsHistoryOpen(false);
+  };
+
+  const deleteChat = async (chatId: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('chat_sessions')
+        .delete()
+        .eq('id', chatId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
+      // Update local state
+      setChatHistory(prev => prev.filter(chat => chat.id !== chatId));
+      
+      // If deleted chat was current, clear it
+      if (currentChat?.id === chatId) {
+        setCurrentChat(null);
+        setSearchParams({});
+      }
+
+      toast({
+        title: "Chat deleted",
+        description: "Chat has been successfully deleted",
+      });
+    } catch (error) {
+      console.error('Error deleting chat:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete chat",
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const clearAllChats = async () => {
+    if (!confirm("Are you sure you want to delete all chat history? This action cannot be undone.")) {
+      return;
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('chat_sessions')
+        .delete()
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
+      setChatHistory([]);
+      setCurrentChat(null);
+      setSearchParams({});
+
+      toast({
+        title: "All chats deleted",
+        description: "All chat history has been cleared",
+      });
+    } catch (error) {
+      console.error('Error clearing chat history:', error);
+      toast({
+        title: "Error", 
+        description: "Failed to clear chat history",
+        variant: 'destructive'
+      });
+    }
   };
 
   // Document generation functions
@@ -622,7 +689,19 @@ ${t.recommendRegisteredMail}`,
           <div className="w-1/4 min-w-[250px]">
             <Card className="h-full dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
-                <CardTitle className="text-sm dark:text-gray-100">{t.history}</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm dark:text-gray-100">{t.history}</CardTitle>
+                  {chatHistory.length > 0 && (
+                    <Button
+                      onClick={clearAllChats}
+                      size="sm"
+                      variant="ghost"
+                      className="h-6 w-6 p-0 text-gray-500 hover:text-red-500"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
                 <Button 
                   onClick={startNewChat}
                   size="sm"
@@ -635,20 +714,29 @@ ${t.recommendRegisteredMail}`,
                 <div className="h-[calc(100%-4rem)] overflow-y-auto chat-container">
                   <div className="p-4 space-y-2">
                     {chatHistory.map((chat) => (
-                      <Button
-                        key={chat.id}
-                        variant={currentChat?.id === chat.id ? "default" : "ghost"}
-                        className={`w-full justify-start text-left h-auto p-3 whitespace-normal ${
-                          currentChat?.id === chat.id 
-                            ? 'bg-[#FF6600] hover:bg-[#FF6600]/90 text-white' 
-                            : 'dark:text-gray-100 dark:hover:bg-gray-700'
-                        }`}
-                        onClick={() => selectChat(chat)}
-                      >
-                        <div className="truncate text-sm">
-                          {chat.title}
-                        </div>
-                      </Button>
+                      <div key={chat.id} className="relative group">
+                        <Button
+                          variant={currentChat?.id === chat.id ? "default" : "ghost"}
+                          className={`w-full justify-start text-left h-auto p-3 pr-8 whitespace-normal ${
+                            currentChat?.id === chat.id 
+                              ? 'bg-[#FF6600] hover:bg-[#FF6600]/90 text-white' 
+                              : 'dark:text-gray-100 dark:hover:bg-gray-700'
+                          }`}
+                          onClick={() => selectChat(chat)}
+                        >
+                          <div className="truncate text-sm">
+                            {chat.title}
+                          </div>
+                        </Button>
+                        <Button
+                          onClick={(e) => deleteChat(chat.id, e)}
+                          size="sm"
+                          variant="ghost"
+                          className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray-500 hover:text-red-500"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -677,7 +765,19 @@ ${t.recommendRegisteredMail}`,
                       </SheetTrigger>
                       <SheetContent side="left" className="w-[280px]">
                         <SheetHeader>
-                          <SheetTitle>{t.history || 'Chat History'}</SheetTitle>
+                          <div className="flex items-center justify-between">
+                            <SheetTitle>{t.history || 'Chat History'}</SheetTitle>
+                            {chatHistory.length > 0 && (
+                              <Button
+                                onClick={clearAllChats}
+                                size="sm"
+                                variant="ghost"
+                                className="h-6 w-6 p-0 text-gray-500 hover:text-red-500"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            )}
+                          </div>
                         </SheetHeader>
                         <div className="mt-4 space-y-2">
                           <Button 
@@ -691,20 +791,29 @@ ${t.recommendRegisteredMail}`,
                           <div className="h-[calc(100vh-14rem)] overflow-y-auto chat-container">
                             <div className="space-y-2">
                               {chatHistory.map((chat) => (
-                                <Button
-                                  key={chat.id}
-                                  variant={currentChat?.id === chat.id ? "default" : "ghost"}
-                                  className={`w-full justify-start text-left h-auto p-3 whitespace-normal ${
-                                    currentChat?.id === chat.id 
-                                      ? 'bg-[#FF6600] hover:bg-[#FF6600]/90 text-white' 
-                                      : 'dark:text-gray-100 dark:hover:bg-gray-700'
-                                  }`}
-                                  onClick={() => selectChat(chat)}
-                                >
-                                  <div className="truncate text-sm">
-                                    {chat.title}
-                                  </div>
-                                </Button>
+                                <div key={chat.id} className="relative group">
+                                  <Button
+                                    variant={currentChat?.id === chat.id ? "default" : "ghost"}
+                                    className={`w-full justify-start text-left h-auto p-3 pr-8 whitespace-normal ${
+                                      currentChat?.id === chat.id 
+                                        ? 'bg-[#FF6600] hover:bg-[#FF6600]/90 text-white' 
+                                        : 'dark:text-gray-100 dark:hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => selectChat(chat)}
+                                  >
+                                    <div className="truncate text-sm">
+                                      {chat.title}
+                                    </div>
+                                  </Button>
+                                  <Button
+                                    onClick={(e) => deleteChat(chat.id, e)}
+                                    size="sm"
+                                    variant="ghost"
+                                    className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray-500 hover:text-red-500"
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </Button>
+                                </div>
                               ))}
                             </div>
                           </div>

@@ -28,13 +28,19 @@ export class N8NChatService {
     try {
       console.log('N8N Request URL:', N8N_WEBHOOK_URL);
       console.log('N8N Request Data:', data);
+      console.log('🌍 Sending language to N8N:', data.language);
       
       const response = await fetch(N8N_WEBHOOK_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept-Language': data.language,
+          'X-Origin': window.location.origin,
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          instruction: `Please respond in ${data.language}. Language code: ${data.language}`
+        }),
       });
 
       console.log('N8N Response Status:', response.status);
