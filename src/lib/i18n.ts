@@ -79,24 +79,7 @@ export const translations = {
     dataLandlordAddress: 'Landlord address',
     dataRentalAddress: 'Rental property address',
     dataDepositAmount: 'Deposit amount',
-    dataMoveOutDate: 'Move-out date',
-    // Chat interface
-    chatTitle: 'RechtAI Chat',
-    chatSubtitle: 'Ask questions about Dutch law and get AI-powered legal guidance',
-    startConversation: 'Start a conversation by asking a legal question',
-    thinking: 'Thinking...',
-    signInToChat: 'Please sign in to use the chat',
-    askLegalQuestion: 'Ask a legal question...',
-    newChat: 'New Chat',
-    clearChat: 'Clear Chat',
-    deleteChat: 'Delete Chat',
-    clearAllHistory: 'Clear All History',
-    chatHistory: 'Chat History',
-    confirmClearChat: 'Are you sure you want to clear this chat?',
-    confirmDeleteChat: 'Are you sure you want to delete this chat?',
-    confirmClearAllHistory: 'Are you sure you want to clear all chat history?',
-    cancel: 'Cancel',
-    confirm: 'Confirm'
+    dataMoveOutDate: 'Move-out date'
   },
   nl: {
     title: 'RechtAI',
@@ -177,24 +160,7 @@ export const translations = {
     dataLandlordAddress: 'Verhuurder adres',
     dataRentalAddress: 'Adres gehuurde woning',
     dataDepositAmount: 'Borgbedrag',
-    dataMoveOutDate: 'Verhuisdatum',
-    // Chat interface
-    chatTitle: 'RechtAI Chat',
-    chatSubtitle: 'Stel vragen over Nederlands recht en krijg AI-gestuurde juridische begeleiding',
-    startConversation: 'Begin een gesprek door een juridische vraag te stellen',
-    thinking: 'Aan het denken...',
-    signInToChat: 'Log in om de chat te gebruiken',
-    askLegalQuestion: 'Stel een juridische vraag...',
-    newChat: 'Nieuwe Chat',
-    clearChat: 'Chat Wissen',
-    deleteChat: 'Chat Verwijderen',
-    clearAllHistory: 'Alle Geschiedenis Wissen',
-    chatHistory: 'Chat Geschiedenis',
-    confirmClearChat: 'Weet je zeker dat je deze chat wilt wissen?',
-    confirmDeleteChat: 'Weet je zeker dat je deze chat wilt verwijderen?',
-    confirmClearAllHistory: 'Weet je zeker dat je alle chat geschiedenis wilt wissen?',
-    cancel: 'Annuleren',
-    confirm: 'Bevestigen'
+    dataMoveOutDate: 'Verhuisdatum'
   },
   ru: {
     title: 'RechtAI',
@@ -275,24 +241,7 @@ export const translations = {
     dataLandlordAddress: 'Адрес арендодателя',
     dataRentalAddress: 'Адрес арендованного жилья',
     dataDepositAmount: 'Сумма депозита',
-    dataMoveOutDate: 'Дата выезда',
-    // Chat interface
-    chatTitle: 'RechtAI Чат',
-    chatSubtitle: 'Задавайте вопросы о голландском праве и получайте юридические советы на основе ИИ',
-    startConversation: 'Начните разговор, задав правовой вопрос',
-    thinking: 'Думаю...',
-    signInToChat: 'Войдите для использования чата',
-    askLegalQuestion: 'Задайте правовой вопрос...',
-    newChat: 'Новый чат',
-    clearChat: 'Очистить чат',
-    deleteChat: 'Удалить чат',
-    clearAllHistory: 'Очистить всю историю',
-    chatHistory: 'История чатов',
-    confirmClearChat: 'Вы уверены, что хотите очистить этот чат?',
-    confirmDeleteChat: 'Вы уверены, что хотите удалить этот чат?',
-    confirmClearAllHistory: 'Вы уверены, что хотите очистить всю историю чатов?',
-    cancel: 'Отмена',
-    confirm: 'Подтвердить'
+    dataMoveOutDate: 'Дата выезда'
   },
   fr: {
     title: 'RechtAI',
@@ -373,24 +322,7 @@ export const translations = {
     dataLandlordAddress: 'Adresse du propriétaire',
     dataRentalAddress: 'Adresse du bien loué',
     dataDepositAmount: 'Montant de la caution',
-    dataMoveOutDate: 'Date de déménagement',
-    // Chat interface
-    chatTitle: 'RechtAI Chat',
-    chatSubtitle: 'Posez des questions sur le droit néerlandais et obtenez des conseils juridiques alimentés par l\'IA',
-    startConversation: 'Commencez une conversation en posant une question juridique',
-    thinking: 'En train de réfléchir...',
-    signInToChat: 'Veuillez vous connecter pour utiliser le chat',
-    askLegalQuestion: 'Posez une question juridique...',
-    newChat: 'Nouveau Chat',
-    clearChat: 'Effacer le Chat',
-    deleteChat: 'Supprimer le Chat',
-    clearAllHistory: 'Effacer Tout l\'Historique',
-    chatHistory: 'Historique du Chat',
-    confirmClearChat: 'Êtes-vous sûr de vouloir effacer ce chat?',
-    confirmDeleteChat: 'Êtes-vous sûr de vouloir supprimer ce chat?',
-    confirmClearAllHistory: 'Êtes-vous sûr de vouloir effacer tout l\'historique des chats?',
-    cancel: 'Annuler',
-    confirm: 'Confirmer'
+    dataMoveOutDate: 'Date de déménagement'
   },
   es: {
     title: 'RechtAI',
@@ -471,24 +403,7 @@ export const translations = {
     dataLandlordAddress: 'Dirección del arrendador',
     dataRentalAddress: 'Dirección de la propiedad alquilada',
     dataDepositAmount: 'Monto del depósito',
-    dataMoveOutDate: 'Fecha de mudanza',
-    // Chat interface
-    chatTitle: 'RechtAI Chat',
-    chatSubtitle: 'Haz preguntas sobre la ley holandesa y obtén orientación legal impulsada por IA',
-    startConversation: 'Comienza una conversación haciendo una pregunta legal',
-    thinking: 'Pensando...',
-    signInToChat: 'Por favor inicia sesión para usar el chat',
-    askLegalQuestion: 'Haz una pregunta legal...',
-    newChat: 'Nuevo Chat',
-    clearChat: 'Limpiar Chat',
-    deleteChat: 'Eliminar Chat',
-    clearAllHistory: 'Limpiar Todo el Historial',
-    chatHistory: 'Historial de Chat',
-    confirmClearChat: '¿Estás seguro de que quieres limpiar este chat?',
-    confirmDeleteChat: '¿Estás seguro de que quieres eliminar este chat?',
-    confirmClearAllHistory: '¿Estás seguro de que quieres limpiar todo el historial de chats?',
-    cancel: 'Cancelar',
-    confirm: 'Confirmar'
+    dataMoveOutDate: 'Fecha de mudanza'
   },
   ar: {
     title: 'RechtAI',
@@ -569,24 +484,7 @@ export const translations = {
     dataLandlordAddress: 'عنوان مالك العقار',
     dataRentalAddress: 'عنوان العقار المؤجر',
     dataDepositAmount: 'مبلغ التأمين',
-    dataMoveOutDate: 'تاريخ الانتقال',
-    // Chat interface
-    chatTitle: 'RechtAI محادثة',
-    chatSubtitle: 'اطرح أسئلة حول القانون الهولندي واحصل على إرشادات قانونية مدعومة بالذكاء الاصطناعي',
-    startConversation: 'ابدأ محادثة بطرح سؤال قانوني',
-    thinking: 'أفكر...',
-    signInToChat: 'يرجى تسجيل الدخول لاستخدام المحادثة',
-    askLegalQuestion: 'اطرح سؤالاً قانونياً...',
-    newChat: 'محادثة جديدة',
-    clearChat: 'مسح المحادثة',
-    deleteChat: 'حذف المحادثة',
-    clearAllHistory: 'مسح كل التاريخ',
-    chatHistory: 'تاريخ المحادثة',
-    confirmClearChat: 'هل أنت متأكد من أنك تريد مسح هذه المحادثة؟',
-    confirmDeleteChat: 'هل أنت متأكد من أنك تريد حذف هذه المحادثة؟',
-    confirmClearAllHistory: 'هل أنت متأكد من أنك تريد مسح كل تاريخ المحادثات؟',
-    cancel: 'إلغاء',
-    confirm: 'تأكيد'
+    dataMoveOutDate: 'تاريخ الانتقال'
   },
   pl: {
     title: 'RechtAI',
@@ -667,24 +565,7 @@ export const translations = {
     dataLandlordAddress: 'Adres wynajmującego',
     dataRentalAddress: 'Adres wynajmowanej nieruchomości',
     dataDepositAmount: 'Kwota kaucji',
-    dataMoveOutDate: 'Data przeprowadzki',
-    // Chat interface
-    chatTitle: 'RechtAI Chat',
-    chatSubtitle: 'Zadaj pytania o prawo holenderskie i otrzymaj wskazówki prawne napędzane przez AI',
-    startConversation: 'Rozpocznij rozmowę zadając pytanie prawne',
-    thinking: 'Myślę...',
-    signInToChat: 'Proszę zaloguj się, aby używać czatu',
-    askLegalQuestion: 'Zadaj pytanie prawne...',
-    newChat: 'Nowy Chat',
-    clearChat: 'Wyczyść Chat',
-    deleteChat: 'Usuń Chat',
-    clearAllHistory: 'Wyczyść Całą Historię',
-    chatHistory: 'Historia Czatu',
-    confirmClearChat: 'Czy jesteś pewien, że chcesz wyczyścić ten czat?',
-    confirmDeleteChat: 'Czy jesteś pewien, że chcesz usunąć ten czat?',
-    confirmClearAllHistory: 'Czy jesteś pewien, że chcesz wyczyścić całą historię czatów?',
-    cancel: 'Anuluj',
-    confirm: 'Potwierdź'
+    dataMoveOutDate: 'Data przeprowadzki'
   },
   de: {
     title: 'RechtAI',
@@ -765,24 +646,7 @@ export const translations = {
     dataLandlordAddress: 'Adresse des Vermieters',
     dataRentalAddress: 'Adresse der Mietwohnung',
     dataDepositAmount: 'Kautionsbetrag',
-    dataMoveOutDate: 'Auszugsdatum',
-    // Chat interface
-    chatTitle: 'RechtAI Chat',
-    chatSubtitle: 'Stellen Sie Fragen zum niederländischen Recht und erhalten Sie KI-gestützte Rechtsberatung',
-    startConversation: 'Beginnen Sie ein Gespräch, indem Sie eine Rechtsfrage stellen',
-    thinking: 'Denke nach...',
-    signInToChat: 'Bitte melden Sie sich an, um den Chat zu verwenden',
-    askLegalQuestion: 'Stellen Sie eine Rechtsfrage...',
-    newChat: 'Neuer Chat',
-    clearChat: 'Chat löschen',
-    deleteChat: 'Chat löschen',
-    clearAllHistory: 'Gesamte Historie löschen',
-    chatHistory: 'Chat-Historie',
-    confirmClearChat: 'Sind Sie sicher, dass Sie diesen Chat löschen möchten?',
-    confirmDeleteChat: 'Sind Sie sicher, dass Sie diesen Chat löschen möchten?',
-    confirmClearAllHistory: 'Sind Sie sicher, dass Sie die gesamte Chat-Historie löschen möchten?',
-    cancel: 'Abbrechen',
-    confirm: 'Bestätigen'
+    dataMoveOutDate: 'Auszugsdatum'
   }
 };
 

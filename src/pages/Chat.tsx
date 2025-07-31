@@ -1,268 +1,815 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Loader2, Send, User, Bot } from 'lucide-react';
-import { toast } from 'sonner';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { Send, Loader2, Globe, History, Plus } from 'lucide-react';
 import { FileAttachmentMenu } from '@/components/chat/FileAttachmentMenu';
+import { FileAttachment } from '@/components/chat/FileUpload';
 import { MessageAttachments } from '@/components/chat/MessageAttachments';
-import { ChatSidebar } from '@/components/chat/ChatSidebar';
-import { N8NChatService, type N8NMessage, type FileAttachment } from '@/services/n8nChatService';
-import { ChatSessionService } from '@/services/chatSessionService';
-import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { N8NChatService } from '@/services/n8nChatService';
 
-export const Chat = () => {
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+  attachments?: FileAttachment[];
+}
+
+type ChatMode = 'chat' | 'document-generation';
+type DocumentType = 'deposit-letter' | 'rental-agreement' | 'complaint-letter';
+
+interface DocumentData {
+  userName?: string;
+  userAddress?: string;
+  landlordName?: string;
+  landlordAddress?: string;
+  rentalAddress?: string;
+  depositAmount?: string;
+  moveOutDate?: string;
+}
+
+interface DocumentGenerationState {
+  mode: ChatMode;
+  documentType?: DocumentType;
+  currentQuestion: number;
+  collectedData: DocumentData;
+  questions: string[];
+  isConfirming: boolean;
+  isGenerating: boolean;
+}
+
+interface ChatSession {
+  id: string;
+  title: string;
+  messages: Message[];
+  created_at: string;
+}
+
+interface ChatHistoryItem {
+  id: string;
+  title: string;
+  messages: any;
+  created_at: string;
+  updated_at: string;
+}
+
+export const Chat: React.FC = () => {
+  const { t, language } = useLanguage();
   const { user } = useAuth();
-  const { language, t } = useLanguage();
-  const [messages, setMessages] = useState<N8NMessage[]>([]);
-  const [input, setInput] = useState('');
+  const { toast } = useToast();
+  const isMobile = useIsMobile();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [currentChat, setCurrentChat] = useState<ChatSession | null>(null);
+  const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<FileAttachment[]>([]);
-  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [documentGenState, setDocumentGenState] = useState<DocumentGenerationState>({
+    mode: 'chat',
+    currentQuestion: 0,
+    collectedData: {},
+    questions: [],
+    isConfirming: false,
+    isGenerating: false
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const sessionId = useRef(crypto.randomUUID());
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = messagesEndRef.current?.parentElement;
+    if (container) {
+      // Only scroll if user is near the bottom (within 100px)
+      const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+      if (isNearBottom) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }
   };
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [currentChat?.messages]);
 
-  const createNewSession = async () => {
-    if (!user) return;
-    
-    try {
-      const newSessionId = await ChatSessionService.createSession(
-        'New Chat',
-        language,
-        user.id
-      );
-      setCurrentSessionId(newSessionId);
-      sessionId.current = newSessionId as any;
-      setMessages([]);
-      setInput('');
-      setAttachedFiles([]);
-    } catch (error) {
-      console.error('Error creating session:', error);
-      toast.error('Failed to create new chat');
+  // Load chat history when user is available
+  useEffect(() => {
+    if (user) {
+      loadChatHistory();
     }
-  };
+  }, [user]);
 
-  const loadSession = async (sessionIdToLoad: string) => {
-    try {
-      const session = await ChatSessionService.getSession(sessionIdToLoad);
-      if (session) {
-        setCurrentSessionId(sessionIdToLoad);
-        sessionId.current = sessionIdToLoad as any;
-        setMessages(session.messages);
-        setInput('');
-        setAttachedFiles([]);
-      }
-    } catch (error) {
-      console.error('Error loading session:', error);
-      toast.error('Failed to load chat');
-    }
-  };
-
-  const saveCurrentSession = async () => {
-    if (currentSessionId && messages.length > 0) {
-      try {
-        await ChatSessionService.updateSessionMessages(currentSessionId, messages);
-      } catch (error) {
-        console.error('Error saving session:', error);
+  // Handle URL parameter for specific chat loading
+  useEffect(() => {
+    const chatId = searchParams.get('id');
+    if (chatId && chatHistory.length > 0) {
+      const existingChat = chatHistory.find(chat => chat.id === chatId);
+      if (existingChat) {
+        setCurrentChat(existingChat);
+      } else {
+        // Try to load the specific chat from database
+        loadSpecificChat(chatId);
       }
     }
+  }, [searchParams, chatHistory]);
+
+  const loadChatHistory = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('chat_sessions')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('updated_at', { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+      
+      // Convert Supabase data to our ChatSession format with proper type conversion
+      const convertedHistory: ChatSession[] = (data || []).map((item: ChatHistoryItem) => ({
+        id: item.id,
+        title: item.title,
+        messages: Array.isArray(item.messages) ? (item.messages as unknown as Message[]) : [],
+        created_at: item.created_at
+      }));
+      
+      setChatHistory(convertedHistory);
+    } catch (error) {
+      console.error('Error loading chat history:', error);
+    }
   };
 
-  const handleSendMessage = async () => {
-    if (!input.trim() && attachedFiles.length === 0) return;
-    
-    if (!user) {
-      toast.error(t.signInToChat);
-      return;
-    }
+  const loadSpecificChat = async (chatId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('chat_sessions')
+        .select('*')
+        .eq('id', chatId)
+        .eq('user_id', user?.id)
+        .single();
 
-    // Create new session if none exists
-    if (!currentSessionId) {
-      await createNewSession();
+      if (error) throw error;
+      
+      if (data) {
+        const specificChat: ChatSession = {
+          id: data.id,
+          title: data.title,
+          messages: Array.isArray(data.messages) ? (data.messages as unknown as Message[]) : [],
+          created_at: data.created_at
+        };
+        
+        setCurrentChat(specificChat);
+        
+        // Add to history if not already there
+        setChatHistory(prev => {
+          const exists = prev.find(chat => chat.id === specificChat.id);
+          if (!exists) {
+            return [specificChat, ...prev];
+          }
+          return prev;
+        });
+      }
+    } catch (error) {
+      console.error('Error loading specific chat:', error);
+      // Clear the URL parameter if chat not found
+      setSearchParams({});
     }
+  };
 
-    const userMessage: N8NMessage = {
-      content: input,
-      role: 'user',
-      timestamp: new Date(),
-      attachments: attachedFiles.length > 0 ? attachedFiles : undefined,
+  const startNewChat = () => {
+    setCurrentChat(null);
+    setSearchParams({});
+    setIsHistoryOpen(false);
+  };
+
+  const selectChat = (chat: ChatSession) => {
+    setCurrentChat(chat);
+    setSearchParams({ id: chat.id });
+    setIsHistoryOpen(false);
+  };
+
+  // Document generation functions
+  const getDocumentQuestions = (documentType: DocumentType): string[] => {
+    switch (documentType) {
+      case 'deposit-letter':
+        return [
+          t.questionUserName,
+          t.questionUserAddress,
+          t.questionLandlordName,
+          t.questionLandlordAddress,
+          t.questionRentalAddress,
+          t.questionDepositAmount,
+          t.questionMoveOutDate
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const enterDocumentMode = (documentType: DocumentType) => {
+    const questions = getDocumentQuestions(documentType);
+    setDocumentGenState({
+      mode: 'document-generation',
+      documentType,
+      currentQuestion: 0,
+      collectedData: {},
+      questions,
+      isConfirming: false,
+      isGenerating: false
+    });
+
+    // Add AI message to start the process
+    const startMessage: Message = {
+      role: 'assistant',
+      content: t.documentModeStart,
+      timestamp: new Date().toISOString()
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
+    if (currentChat) {
+      setCurrentChat({
+        ...currentChat,
+        messages: [...currentChat.messages, startMessage]
+      });
+    }
+
+    // Ask first question
+    setTimeout(() => {
+      const firstQuestionMessage: Message = {
+        role: 'assistant',
+        content: questions[0],
+        timestamp: new Date().toISOString()
+      };
+
+      if (currentChat) {
+        setCurrentChat(prev => prev ? {
+          ...prev,
+          messages: [...prev.messages, firstQuestionMessage]
+        } : null);
+      }
+    }, 500);
+  };
+
+  const handleDocumentAnswer = (answer: string) => {
+    const { currentQuestion, questions, collectedData } = documentGenState;
+    
+    // Map question index to data field
+    const dataKeys = ['userName', 'userAddress', 'landlordName', 'landlordAddress', 'rentalAddress', 'depositAmount', 'moveOutDate'];
+    const currentKey = dataKeys[currentQuestion] as keyof DocumentData;
+    
+    const updatedData = {
+      ...collectedData,
+      [currentKey]: answer
+    };
+
+    if (currentQuestion < questions.length - 1) {
+      // Move to next question
+      setDocumentGenState(prev => ({
+        ...prev,
+        currentQuestion: currentQuestion + 1,
+        collectedData: updatedData
+      }));
+
+      // Ask next question
+      setTimeout(() => {
+        const nextQuestionMessage: Message = {
+          role: 'assistant',
+          content: questions[currentQuestion + 1],
+          timestamp: new Date().toISOString()
+        };
+
+        if (currentChat) {
+          setCurrentChat(prev => prev ? {
+            ...prev,
+            messages: [...prev.messages, nextQuestionMessage]
+          } : null);
+        }
+      }, 500);
+    } else {
+      // All questions answered, show confirmation
+      setDocumentGenState(prev => ({
+        ...prev,
+        collectedData: updatedData,
+        isConfirming: true
+      }));
+
+      showDataConfirmation(updatedData);
+    }
+  };
+
+  const showDataConfirmation = (data: DocumentData) => {
+    const confirmationText = `${t.confirmData}
+
+${t.dataUserName}: ${data.userName}
+${t.dataUserAddress}: ${data.userAddress}
+${t.dataLandlordName}: ${data.landlordName}
+${t.dataLandlordAddress}: ${data.landlordAddress}
+${t.dataRentalAddress}: ${data.rentalAddress}
+${t.dataDepositAmount}: ${data.depositAmount} €
+${t.dataMoveOutDate}: ${data.moveOutDate}
+
+${t.allCorrect}`;
+
+    const confirmationMessage: Message = {
+      role: 'assistant',
+      content: confirmationText,
+      timestamp: new Date().toISOString()
+    };
+
+    if (currentChat) {
+      setCurrentChat(prev => prev ? {
+        ...prev,
+        messages: [...prev.messages, confirmationMessage]
+      } : null);
+    }
+  };
+
+  const generateDocument = async () => {
+    setDocumentGenState(prev => ({ ...prev, isGenerating: true }));
+
+    // Show generating message
+    const generatingMessage: Message = {
+      role: 'assistant',
+      content: t.generatingDocument,
+      timestamp: new Date().toISOString()
+    };
+
+    if (currentChat) {
+      setCurrentChat(prev => prev ? {
+        ...prev,
+        messages: [...prev.messages, generatingMessage]
+      } : null);
+    }
+
+    try {
+      // Call PDF generation endpoint
+      const { data, error } = await supabase.functions.invoke('generate-document-pdf', {
+        body: {
+          documentType: documentGenState.documentType,
+          documentData: documentGenState.collectedData,
+          language: language
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.pdfUrl) {
+        const successMessage: Message = {
+          role: 'assistant',
+          content: `${t.documentReady}
+
+[${t.downloadPdf}](${data.pdfUrl})
+
+${t.recommendRegisteredMail}`,
+          timestamp: new Date().toISOString()
+        };
+
+        if (currentChat) {
+          setCurrentChat(prev => prev ? {
+            ...prev,
+            messages: [...prev.messages, successMessage]
+          } : null);
+        }
+      }
+    } catch (error) {
+      console.error('Error generating document:', error);
+      toast({
+        title: t.error,
+        description: 'Failed to generate document. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      // Reset document generation state
+      setDocumentGenState({
+        mode: 'chat',
+        currentQuestion: 0,
+        collectedData: {},
+        questions: [],
+        isConfirming: false,
+        isGenerating: false
+      });
+    }
+  };
+
+  const resetDocumentGeneration = () => {
+    setDocumentGenState({
+      mode: 'chat',
+      currentQuestion: 0,
+      collectedData: {},
+      questions: [],
+      isConfirming: false,
+      isGenerating: false
+    });
+
+    const resetMessage: Message = {
+      role: 'assistant',
+      content: 'Хорошо, давайте начнем сначала. Как я могу вам помочь?',
+      timestamp: new Date().toISOString()
+    };
+
+    if (currentChat) {
+      setCurrentChat(prev => prev ? {
+        ...prev,
+        messages: [...prev.messages, resetMessage]
+      } : null);
+    }
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if ((!message.trim() && attachedFiles.length === 0) || isLoading) return;
+
+    const userMessage = message.trim();
+    const messageAttachments = [...attachedFiles];
+    setMessage('');
     setAttachedFiles([]);
     setIsLoading(true);
 
-    try {
-      const response = await N8NChatService.sendMessage(
-        input,
-        attachedFiles.length > 0 ? attachedFiles : undefined,
-        sessionId.current,
-        language
-      );
-
-      const assistantMessage: N8NMessage = {
-        content: response,
-        role: 'assistant',
-        timestamp: new Date(),
+    // Handle document generation mode
+    if (documentGenState.mode === 'document-generation') {
+      const newUserMessage: Message = {
+        role: 'user',
+        content: userMessage,
+        timestamp: new Date().toISOString()
       };
 
-      const updatedMessages = [...messages, userMessage, assistantMessage];
-      setMessages(updatedMessages);
-      
-      // Save to database
-      if (currentSessionId) {
-        await ChatSessionService.updateSessionMessages(currentSessionId, updatedMessages);
+      if (currentChat) {
+        setCurrentChat({
+          ...currentChat,
+          messages: [...currentChat.messages, newUserMessage]
+        });
       }
-    } catch (error) {
-      console.error('Chat error:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to send message');
+
+      // Handle confirmation responses
+      if (documentGenState.isConfirming) {
+        if (userMessage.toLowerCase().includes('да') || userMessage.toLowerCase().includes('yes') || userMessage.toLowerCase().includes('ja') || userMessage.toLowerCase().includes('oui')) {
+          await generateDocument();
+        } else {
+          resetDocumentGeneration();
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      // Handle document answers
+      handleDocumentAnswer(userMessage);
+      setIsLoading(false);
+      return;
+    }
+
+    console.log('🌍 Sending message with language:', language);
+    console.log('🔧 Request details:', {
+      message: userMessage,
+      chatId: currentChat?.id,
+      language: language,
+      userId: user?.id
+    });
+
+    try {
+      const newUserMessage: Message = {
+        role: 'user',
+        content: userMessage || 'Файлы прикреплены',
+        timestamp: new Date().toISOString(),
+        attachments: messageAttachments
+      };
+
+      if (currentChat) {
+        setCurrentChat({
+          ...currentChat,
+          messages: [...currentChat.messages, newUserMessage]
+        });
+      }
+
+      console.log('📡 Calling N8N webhook...');
+      
+      const data = await N8NChatService.sendMessage(
+        userMessage,
+        user?.id || '',
+        language,
+        currentChat?.id,
+        messageAttachments
+      );
+
+      console.log('✅ N8N response:', data);
+
+      if (data?.error) {
+        console.error('❌ Application error from N8N:', data.error);
+        if (data.type === 'LIMIT_REACHED') {
+          toast({
+            title: t.chatLimitReached || 'Chat limit reached',
+            description: t.upgradeForUnlimited || 'Upgrade to Premium for unlimited chats',
+            variant: 'destructive'
+          });
+          return;
+        }
+        throw new Error(data.error);
+      }
+
+      if (!data?.response) {
+        console.error('❌ Missing response from N8N:', data);
+        throw new Error('No response received from AI service');
+      }
+
+      const aiMessage: Message = {
+        role: 'assistant',
+        content: data.response,
+        timestamp: new Date().toISOString()
+      };
+
+      // Check if AI response contains document generation triggers
+      if (data.response.includes('[DOCUMENT:deposit-letter]')) {
+        setTimeout(() => {
+          enterDocumentMode('deposit-letter');
+        }, 1000);
+      }
+
+      if (currentChat) {
+        const updatedChat = {
+          ...currentChat,
+          messages: [...currentChat.messages, newUserMessage, aiMessage]
+        };
+        setCurrentChat(updatedChat);
+        
+        setChatHistory(prev => prev.map(chat => 
+          chat.id === updatedChat.id ? updatedChat : chat
+        ));
+      } else {
+        const newChat: ChatSession = {
+          id: data.chatId || `chat-${Date.now()}`,
+          title: userMessage.length > 50 ? userMessage.substring(0, 50) + '...' : userMessage,
+          messages: [newUserMessage, aiMessage],
+          created_at: new Date().toISOString()
+        };
+        setCurrentChat(newChat);
+        setChatHistory(prev => [newChat, ...prev]);
+        
+        setSearchParams({ id: newChat.id });
+      }
+
+
+    } catch (error: any) {
+      console.error('💥 Complete error details:', {
+        error,
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+        cause: error.cause
+      });
+
+      let errorMessage = t.failedToSendMessage || 'Failed to send message';
+      let errorTitle = t.error || 'Error';
+
+      if (error.message?.includes('non-2xx status code')) {
+        errorMessage = 'Server returned an error. Please try again in a moment.';
+        errorTitle = 'Service Temporarily Unavailable';
+      } else if (error.message?.includes('network')) {
+        errorMessage = 'Network connection issue. Please check your internet connection.';
+        errorTitle = 'Connection Error';
+      } else if (error.message?.includes('timeout')) {
+        errorMessage = 'Request timed out. Please try again.';
+        errorTitle = 'Timeout Error';
+      }
+
+      toast({
+        title: errorTitle,
+        description: errorMessage,
+        variant: 'destructive'
+      });
+
+      if (currentChat) {
+        setCurrentChat({
+          ...currentChat,
+          messages: currentChat.messages.slice(0, -1)
+        });
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
+  if (!user) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
+          <CardContent className="text-center py-8">
+            <p className="text-lg dark:text-gray-100">{t.loginToAccount}</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex h-screen w-full">
-      <ChatSidebar
-        currentSessionId={currentSessionId}
-        onSessionSelect={loadSession}
-        onNewChat={createNewSession}
-        onClearAllHistory={() => {
-          setMessages([]);
-          setCurrentSessionId(null);
-          sessionId.current = crypto.randomUUID();
-        }}
-      />
-      
-      <div className="flex-1 flex flex-col bg-background">
-        <div className="p-6 border-b border-border bg-card">
-          <h1 className="text-2xl font-bold text-foreground">{t.chatTitle}</h1>
-          <p className="text-base text-muted-foreground">
-            {t.chatSubtitle}
-          </p>
-        </div>
-
-        <ScrollArea className="flex-1 p-6">
-          <div className="space-y-4">
-            {messages.length === 0 && (
-              <div className="text-center text-muted-foreground py-8">
-                <Bot className="mx-auto mb-4 h-12 w-12 opacity-50" />
-                <p>{t.startConversation}</p>
-              </div>
-            )}
-
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex items-start gap-3 ${
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
-                }`}
-              >
-                {message.role === 'assistant' && (
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Bot className="w-4 h-4 text-primary" />
-                  </div>
-                )}
-
-                <div
-                  className={`max-w-[80%] p-3 rounded-lg ${
-                    message.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
-                  }`}
+    <div className="h-full flex gap-4 p-4 relative">
+      <style>{`
+        .chat-container {
+          position: relative;
+          overflow-anchor: none;
+          touch-action: pan-y;
+          -webkit-overflow-scrolling: touch;
+          overscroll-behavior: contain;
+        }
+      `}</style>
+      <div className="flex gap-4 h-full w-full">
+        {/* Desktop Chat History Sidebar */}
+        {!isMobile && (
+          <div className="w-1/4 min-w-[250px]">
+            <Card className="h-full dark:bg-gray-800 dark:border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-sm dark:text-gray-100">{t.history}</CardTitle>
+                <Button 
+                  onClick={startNewChat}
+                  size="sm"
+                  className="w-full bg-[#FF6600] hover:bg-[#FF6600]/90"
                 >
-                  <div className="whitespace-pre-wrap">{message.content}</div>
+                  {t.startChat}
+                </Button>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="h-[calc(100%-4rem)] overflow-y-auto chat-container">
+                  <div className="p-4 space-y-2">
+                    {chatHistory.map((chat) => (
+                      <Button
+                        key={chat.id}
+                        variant={currentChat?.id === chat.id ? "default" : "ghost"}
+                        className={`w-full justify-start text-left h-auto p-3 whitespace-normal ${
+                          currentChat?.id === chat.id 
+                            ? 'bg-[#FF6600] hover:bg-[#FF6600]/90 text-white' 
+                            : 'dark:text-gray-100 dark:hover:bg-gray-700'
+                        }`}
+                        onClick={() => selectChat(chat)}
+                      >
+                        <div className="truncate text-sm">
+                          {chat.title}
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Main Chat Area */}
+        <div className="flex-1 w-full">
+          <Card className="h-full flex flex-col dark:bg-gray-800 dark:border-gray-700">
+            <CardHeader className="flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CardTitle className="dark:text-gray-100 text-sm md:text-base">
+                    {currentChat ? currentChat.title : t.chat}
+                  </CardTitle>
                   
-                  {message.attachments && message.attachments.length > 0 && (
-                    <div className="mt-2">
-                      <MessageAttachments attachments={message.attachments} />
+                  {/* Mobile History Button */}
+                  {isMobile && (
+                    <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
+                      <SheetTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <History className="h-4 w-4" />
+                        </Button>
+                      </SheetTrigger>
+                      <SheetContent side="left" className="w-[280px]">
+                        <SheetHeader>
+                          <SheetTitle>{t.history || 'Chat History'}</SheetTitle>
+                        </SheetHeader>
+                        <div className="mt-4 space-y-2">
+                          <Button 
+                            onClick={startNewChat}
+                            size="sm"
+                            className="w-full bg-[#FF6600] hover:bg-[#FF6600]/90"
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            {t.startChat}
+                          </Button>
+                          <div className="h-[calc(100vh-14rem)] overflow-y-auto chat-container">
+                            <div className="space-y-2">
+                              {chatHistory.map((chat) => (
+                                <Button
+                                  key={chat.id}
+                                  variant={currentChat?.id === chat.id ? "default" : "ghost"}
+                                  className={`w-full justify-start text-left h-auto p-3 whitespace-normal ${
+                                    currentChat?.id === chat.id 
+                                      ? 'bg-[#FF6600] hover:bg-[#FF6600]/90 text-white' 
+                                      : 'dark:text-gray-100 dark:hover:bg-gray-700'
+                                  }`}
+                                  onClick={() => selectChat(chat)}
+                                >
+                                  <div className="truncate text-sm">
+                                    {chat.title}
+                                  </div>
+                                </Button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </SheetContent>
+                    </Sheet>
+                  )}
+                </div>
+                
+                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                  <Globe className="h-4 w-4" />
+                  <span className="text-xs">{language.toUpperCase()}</span>
+                </div>
+              </div>
+              
+              {/* Mobile New Chat Button */}
+              {isMobile && (
+                <Button 
+                  onClick={startNewChat}
+                  size="sm"
+                  className="w-full bg-[#FF6600] hover:bg-[#FF6600]/90"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t.startChat}
+                </Button>
+              )}
+            </CardHeader>
+            
+            <CardContent className="flex-1 flex flex-col p-0 min-h-0">
+              {/* Messages Area */}
+              <div className="flex-1 min-h-0 relative">
+                <div className="h-full overflow-y-auto p-4 chat-container">
+                  {currentChat?.messages.length ? (
+                    <div className="space-y-4">
+                      {currentChat.messages.map((msg, index) => (
+                        <div
+                          key={index}
+                          className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
+                           <div
+                             className={`max-w-[85%] md:max-w-[80%] p-3 rounded-lg ${
+                               msg.role === 'user'
+                                 ? 'bg-[#FF6600] text-white'
+                                 : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
+                             }`}
+                           >
+                             <div className="whitespace-pre-wrap text-sm md:text-base">{msg.content}</div>
+                             {msg.attachments && msg.attachments.length > 0 && (
+                               <MessageAttachments attachments={msg.attachments} />
+                             )}
+                             <div className="text-xs opacity-70 mt-1">
+                               {new Date(msg.timestamp).toLocaleTimeString()}
+                             </div>
+                           </div>
+                        </div>
+                      ))}
+                      <div ref={messagesEndRef} />
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
+                      <div className="text-center px-4">
+                        <p className="text-base md:text-lg mb-2">{t.getHelp}</p>
+                        <p className="text-sm">{t.description}</p>
+                        <div className="flex items-center justify-center gap-2 mt-4 text-xs">
+                          <Globe className="h-3 w-3" />
+                          <span>Language: {language.toUpperCase()}</span>
+                        </div>
+                      </div>
                     </div>
                   )}
-
-                  <div className="text-xs opacity-70 mt-2">
-                    {message.timestamp.toLocaleTimeString()}
-                  </div>
-                </div>
-
-                {message.role === 'user' && (
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <User className="w-4 h-4 text-primary" />
-                  </div>
-                )}
-              </div>
-            ))}
-
-            {isLoading && (
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Bot className="w-4 h-4 text-primary" />
-                </div>
-                <div className="bg-muted p-3 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>{t.thinking}</span>
-                  </div>
                 </div>
               </div>
-            )}
-          </div>
-          <div ref={messagesEndRef} />
-        </ScrollArea>
 
-        <div className="p-6 border-t border-border bg-card">
-          {attachedFiles.length > 0 && (
-            <div className="mb-3">
-              <MessageAttachments attachments={attachedFiles} />
-            </div>
-          )}
-
-          <div className="flex gap-2">
-            <FileAttachmentMenu
-              onFilesChange={setAttachedFiles}
-              attachedFiles={attachedFiles}
-              sessionId={sessionId.current}
-            />
-            
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder={t.askLegalQuestion}
-              disabled={isLoading}
-              className="flex-1"
-            />
-            
-            <Button
-              onClick={handleSendMessage}
-              disabled={isLoading || (!input.trim() && attachedFiles.length === 0)}
-              size="icon"
-            >
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Send className="w-4 h-4" />
-              )}
-            </Button>
+              {/* Message Input */}
+              <div className="border-t dark:border-gray-700 p-4 flex-shrink-0">
+                {/* Message Form */}
+                <form onSubmit={handleSendMessage} className="flex gap-2 items-end">
+                    <FileAttachmentMenu 
+                      onFilesChange={setAttachedFiles}
+                      attachedFiles={attachedFiles}
+                      sessionId={currentChat?.id}
+                    />
+                    <Input
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      placeholder={t.typeYourLegalQuestion || "Type your legal question..."}
+                      disabled={isLoading}
+                      className="flex-1 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 text-sm md:text-base"
+                    />
+                    <Button
+                      type="submit"
+                      disabled={(!message.trim() && attachedFiles.length === 0) || isLoading}
+                      className="bg-[#FF6600] hover:bg-[#FF6600]/90 px-3 md:px-4"
+                    >
+                      {isLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Send className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </form>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </div>
       </div>
     </div>
   );
