@@ -710,8 +710,8 @@ ${t.recommendRegisteredMail}`,
                   {t.startChat}
                 </Button>
               </CardHeader>
-              <CardContent className="p-0">
-                <ScrollArea className="h-[calc(100vh-12rem)]">
+              <CardContent className="p-0 h-[calc(100vh-16rem)]">
+                <ScrollArea className="h-full">
                   <div className="p-4 space-y-2">
                     {chatHistory.map((chat) => (
                       <div key={chat.id} className="relative group">
