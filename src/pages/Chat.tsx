@@ -673,7 +673,7 @@ ${t.recommendRegisteredMail}`,
   }
 
   return (
-    <div className="h-full flex gap-4 p-4 relative">
+    <div className="h-full flex gap-4 p-0 relative">
       <style>{`
         .chat-container {
           position: relative;
@@ -683,11 +683,10 @@ ${t.recommendRegisteredMail}`,
           overscroll-behavior: contain;
         }
       `}</style>
-      <div className="flex gap-4 h-full w-full">
-        {/* Desktop Chat History Sidebar */}
-        {!isMobile && (
-          <div className="w-1/4 min-w-[250px]">
-            <Card className="h-full flex flex-col dark:bg-gray-800 dark:border-gray-700">
+      {/* Desktop Chat History Sidebar */}
+      {!isMobile && (
+        <div className="w-1/4 min-w-[250px]">
+          <Card className="h-full flex flex-col dark:bg-gray-800 dark:border-gray-700 m-4">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm dark:text-gray-100">{t.history}</CardTitle>
@@ -711,7 +710,7 @@ ${t.recommendRegisteredMail}`,
                 </Button>
               </CardHeader>
               <CardContent className="p-0 flex-1">
-                <ScrollArea className="h-[calc(100%-8rem)]">
+                <ScrollArea className="h-[calc(100%-120px)]">
                   <div className="p-4 space-y-2">
                     {chatHistory.map((chat) => (
                       <div key={chat.id} className="relative group">
@@ -745,9 +744,9 @@ ${t.recommendRegisteredMail}`,
           </div>
         )}
 
-        {/* Main Chat Area */}
-        <div className="flex-1 w-full">
-          <Card className="h-full flex flex-col dark:bg-gray-800 dark:border-gray-700">
+      {/* Main Chat Area */}
+      <div className="flex-1 w-full">
+        <Card className="h-full flex flex-col dark:bg-gray-800 dark:border-gray-700 m-4">
             <CardHeader className="flex-shrink-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -919,7 +918,6 @@ ${t.recommendRegisteredMail}`,
               </CardContent>
             </Card>
           </div>
-      </div>
     </div>
   );
 };
