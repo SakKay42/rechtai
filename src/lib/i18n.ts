@@ -54,6 +54,14 @@ export const translations = {
     signUpToUpgrade: 'Sign Up to Upgrade',
     takePhoto: 'Take Photo',
     rentalLawNotice: 'Our application currently works only with rental law questions.\nOther areas of legislation will be added later.\nWe are already training models to expand capabilities.',
+    // Pricing preview keys
+    pricingPreview: 'Choose Your Plan',
+    freeFeatures: '1 chat per month',
+    premiumFeatures: 'Unlimited chats + PDF export + Document generation',
+    perMonth: '/month',
+    tryFree: 'Try Free',
+    startPremium: 'Start Premium',
+    viewAllPlans: 'View All Plans',
     // Document generation keys
     documentModeStart: 'Excellent! To prepare this document, I need to ask you 5-6 questions. Please answer them one by one.',
     confirmData: 'Thank you! Let\'s check everything. Data for the document:',
@@ -135,6 +143,14 @@ export const translations = {
     signUpToUpgrade: 'Registreer om te Upgraden',
     takePhoto: 'Foto Maken',
     rentalLawNotice: 'Onze applicatie werkt momenteel alleen met vragen over huurrecht.\nAndere rechtsgebieden worden later toegevoegd.\nWe trainen al modellen om de mogelijkheden uit te breiden.',
+    // Pricing preview keys
+    pricingPreview: 'Kies Je Plan',
+    freeFeatures: '1 chat per maand',
+    premiumFeatures: 'Onbeperkte chats + PDF export + Document generatie',
+    perMonth: '/maand',
+    tryFree: 'Probeer Gratis',
+    startPremium: 'Start Premium',
+    viewAllPlans: 'Bekijk Alle Plannen',
     // Document generation keys
     documentModeStart: 'Uitstekend! Om dit document op te stellen, moet ik je 5-6 vragen stellen. Beantwoord ze één voor één.',
     confirmData: 'Dank je! Laten we alles controleren. Gegevens voor het document:',
@@ -216,6 +232,14 @@ export const translations = {
     signUpToUpgrade: 'Зарегистрируйтесь для Обновления',
     takePhoto: 'Сделать Фото',
     rentalLawNotice: 'Наше приложение сейчас работает только с вопросами по арендному праву.\nОстальные разделы законодательства будут добавлены позже.\nМы уже обучаем модели для расширения возможностей.',
+    // Pricing preview keys
+    pricingPreview: 'Выберите Ваш План',
+    freeFeatures: '1 чат в месяц',
+    premiumFeatures: 'Неограниченные чаты + PDF экспорт + Генерация документов',
+    perMonth: '/месяц',
+    tryFree: 'Попробовать Бесплатно',
+    startPremium: 'Начать Premium',
+    viewAllPlans: 'Посмотреть Все Планы',
     // Document generation keys
     documentModeStart: 'Отлично! Чтобы составить этот документ, мне нужно задать вам 5-6 вопросов. Пожалуйста, отвечайте на них по одному.',
     confirmData: 'Спасибо! Давайте все проверим. Данные для документа:',
@@ -297,6 +321,14 @@ export const translations = {
     signUpToUpgrade: 'S\'inscrire pour Mettre à Niveau',
     takePhoto: 'Prendre une Photo',
     rentalLawNotice: 'Notre application ne fonctionne actuellement qu\'avec les questions de droit locatif.\nD\'autres domaines de législation seront ajoutés plus tard.\nNous entraînons déjà des modèles pour élargir les capacités.',
+    // Pricing preview keys
+    pricingPreview: 'Choisissez Votre Plan',
+    freeFeatures: '1 chat par mois',
+    premiumFeatures: 'Chats illimités + Export PDF + Génération de documents',
+    perMonth: '/mois',
+    tryFree: 'Essayer Gratuitement',
+    startPremium: 'Commencer Premium',
+    viewAllPlans: 'Voir Tous les Plans',
     // Document generation keys
     documentModeStart: 'Excellent! Pour préparer ce document, je dois vous poser 5-6 questions. Veuillez y répondre une par une.',
     confirmData: 'Merci! Vérifions tout. Données pour le document:',
@@ -378,6 +410,14 @@ export const translations = {
     signUpToUpgrade: 'Regístrate para Actualizar',
     takePhoto: 'Tomar Foto',
     rentalLawNotice: 'Nuestra aplicación actualmente funciona solo con preguntas de derecho de alquiler.\nOtras áreas de legislación se agregarán más tarde.\nYa estamos entrenando modelos para expandir las capacidades.',
+    // Pricing preview keys
+    pricingPreview: 'Elige Tu Plan',
+    freeFeatures: '1 chat por mes',
+    premiumFeatures: 'Chats ilimitados + Exportar PDF + Generación de documentos',
+    perMonth: '/mes',
+    tryFree: 'Probar Gratis',
+    startPremium: 'Comenzar Premium',
+    viewAllPlans: 'Ver Todos los Planes',
     // Document generation keys
     documentModeStart: '¡Excelente! Para preparar este documento, necesito hacerte 5-6 preguntas. Por favor respóndelas una por una.',
     confirmData: '¡Gracias! Revisemos todo. Datos para el documento:',
@@ -459,6 +499,14 @@ export const translations = {
     signUpToUpgrade: 'التسجيل للترقية',
     takePhoto: 'التقاط صورة',
     rentalLawNotice: 'يعمل تطبيقنا حاليًا فقط مع أسئلة قانون الإيجار.\nستتم إضافة مجالات أخرى من التشريع لاحقًا.\nنحن ندرب بالفعل نماذج لتوسيع القدرات',
+    // Pricing preview keys
+    pricingPreview: 'اختر خطتك',
+    freeFeatures: '1 محادثة في الشهر',
+    premiumFeatures: 'محادثات غير محدودة + تصدير PDF + توليد الوثائق',
+    perMonth: '/شهر',
+    tryFree: 'جرب مجاناً',
+    startPremium: 'ابدأ بـ Premium',
+    viewAllPlans: 'عرض جميع الخطط',
     // Document generation keys
     documentModeStart: 'ممتاز! لإعداد هذا المستند، أحتاج لطرح 5-6 أسئلة عليك. يرجى الإجابة عليها واحداً تلو الآخر.',
     confirmData: 'شكراً! دعنا نراجع كل شيء. بيانات المستند:',
@@ -540,6 +588,14 @@ export const translations = {
     signUpToUpgrade: 'Zarejestruj się aby Uaktualnić',
     takePhoto: 'Zrób Zdjęcie',
     rentalLawNotice: 'Nasza aplikacja obecnie działa tylko z pytaniami dotyczącymi prawa najmu.\nInne obszary legislacji zostaną dodane później.\nJuż trenujemy modele, aby rozszerzyć możliwości.',
+    // Pricing preview keys
+    pricingPreview: 'Wybierz Swój Plan',
+    freeFeatures: '1 czat miesięcznie',
+    premiumFeatures: 'Nieograniczone czaty + Eksport PDF + Generowanie dokumentów',
+    perMonth: '/miesiąc',
+    tryFree: 'Wypróbuj za Darmo',
+    startPremium: 'Zacznij Premium',
+    viewAllPlans: 'Zobacz Wszystkie Plany',
     // Document generation keys
     documentModeStart: 'Doskonale! Aby przygotować ten dokument, muszę zadać Ci 5-6 pytań. Proszę odpowiadaj na nie jeden po drugim.',
     confirmData: 'Dziękuję! Sprawdźmy wszystko. Dane do dokumentu:',
@@ -621,6 +677,14 @@ export const translations = {
     signUpToUpgrade: 'Registrieren zum Upgraden',
     takePhoto: 'Foto Aufnehmen',
     rentalLawNotice: 'Unsere Anwendung funktioniert derzeit nur mit Fragen zum Mietrecht.\nAndere Gesetzgebungsbereiche werden später hinzugefügt.\nWir trainieren bereits Modelle, um die Möglichkeiten zu erweitern.',
+    // Pricing preview keys
+    pricingPreview: 'Wählen Sie Ihren Plan',
+    freeFeatures: '1 Chat pro Monat',
+    premiumFeatures: 'Unbegrenzte Chats + PDF-Export + Dokumentengenerierung',
+    perMonth: '/Monat',
+    tryFree: 'Kostenlos Testen',
+    startPremium: 'Premium Starten',
+    viewAllPlans: 'Alle Pläne Anzeigen',
     // Document generation keys
     documentModeStart: 'Ausgezeichnet! Um dieses Dokument zu erstellen, muss ich Ihnen 5-6 Fragen stellen. Bitte beantworten Sie sie nacheinander.',
     confirmData: 'Danke! Lassen Sie uns alles überprüfen. Daten für das Dokument:',

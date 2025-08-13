@@ -86,6 +86,79 @@ export const Home: React.FC = () => {
         </Card>
       </div>
 
+      {/* Pricing Preview Section */}
+      <div className="mb-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-foreground mb-4">
+            {t.pricingPreview}
+          </h2>
+        </div>
+        
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {/* Free Plan */}
+          <Card className="border-2 hover:shadow-lg transition-shadow dark:bg-gray-800 dark:border-gray-700 relative">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl font-bold text-foreground mb-2">
+                {t.free}
+              </CardTitle>
+              <div className="text-3xl font-bold text-foreground mb-4">
+                €0<span className="text-base font-normal text-muted-foreground">{t.perMonth}</span>
+              </div>
+              <CardDescription className="text-muted-foreground">
+                {t.freeFeatures}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <Button 
+                variant="outline" 
+                className="w-full border-[#FF6600] text-[#FF6600] hover:bg-[#FF6600] hover:text-white"
+                onClick={() => navigate('/auth')}
+              >
+                {t.tryFree}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Premium Plan */}
+          <Card className="border-2 border-[#FF6600] hover:shadow-lg transition-shadow dark:bg-gray-800 dark:border-[#FF6600] relative">
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+              <span className="bg-[#FF6600] text-white px-4 py-1 rounded-full text-sm font-medium">
+                {t.premium}
+              </span>
+            </div>
+            <CardHeader className="text-center pt-8">
+              <CardTitle className="text-2xl font-bold text-foreground mb-2">
+                {t.premium}
+              </CardTitle>
+              <div className="text-3xl font-bold text-foreground mb-4">
+                €9,99<span className="text-base font-normal text-muted-foreground">{t.perMonth}</span>
+              </div>
+              <CardDescription className="text-muted-foreground">
+                {t.premiumFeatures}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <Button 
+                className="w-full bg-[#FF6600] hover:bg-[#FF6600]/90 text-white"
+                onClick={() => navigate('/auth')}
+              >
+                {t.startPremium}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div className="text-center mt-8">
+          <Button 
+            variant="ghost" 
+            className="text-[#FF6600] hover:text-[#FF6600]/80"
+            onClick={() => navigate('/pricing')}
+          >
+            {t.viewAllPlans} →
+          </Button>
+        </div>
+      </div>
+
       {/* CTA Section */}
       <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-2xl p-12">
         <div className="max-w-3xl mx-auto">
