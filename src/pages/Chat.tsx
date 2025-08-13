@@ -687,7 +687,7 @@ ${t.recommendRegisteredMail}`,
         {/* Desktop Chat History Sidebar */}
         {!isMobile && (
           <div className="w-1/4 min-w-[250px]">
-            <Card className="h-full dark:bg-gray-800 dark:border-gray-700">
+            <Card className="h-full flex flex-col dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm dark:text-gray-100">{t.history}</CardTitle>
@@ -710,7 +710,7 @@ ${t.recommendRegisteredMail}`,
                   {t.startChat}
                 </Button>
               </CardHeader>
-              <CardContent className="p-0 h-[calc(100vh-16rem)]">
+              <CardContent className="p-0 flex-1">
                 <ScrollArea className="h-full">
                   <div className="p-4 space-y-2">
                     {chatHistory.map((chat) => (
