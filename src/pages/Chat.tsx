@@ -711,7 +711,7 @@ ${t.recommendRegisteredMail}`,
                 </Button>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="h-[calc(100%-4rem)] overflow-y-auto chat-container">
+                <ScrollArea className="h-[calc(100%-4rem)]">
                   <div className="p-4 space-y-2">
                     {chatHistory.map((chat) => (
                       <div key={chat.id} className="relative group">
@@ -739,7 +739,7 @@ ${t.recommendRegisteredMail}`,
                       </div>
                     ))}
                   </div>
-                </div>
+                </ScrollArea>
               </CardContent>
             </Card>
           </div>
@@ -788,8 +788,8 @@ ${t.recommendRegisteredMail}`,
                             <Plus className="h-4 w-4 mr-2" />
                             {t.startChat}
                           </Button>
-                          <div className="h-[calc(100vh-14rem)] overflow-y-auto chat-container">
-                            <div className="space-y-2">
+                          <ScrollArea className="h-[calc(100vh-14rem)]">
+                            <div className="p-4 space-y-2">
                               {chatHistory.map((chat) => (
                                 <div key={chat.id} className="relative group">
                                   <Button
@@ -816,7 +816,7 @@ ${t.recommendRegisteredMail}`,
                                 </div>
                               ))}
                             </div>
-                          </div>
+                          </ScrollArea>
                         </div>
                       </SheetContent>
                     </Sheet>
