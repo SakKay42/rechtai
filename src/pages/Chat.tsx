@@ -673,7 +673,7 @@ ${t.recommendRegisteredMail}`,
   }
 
   return (
-    <div className="h-full flex gap-4 p-4 relative">
+    <div className="h-full flex relative">
       <style>{`
         .chat-container {
           position: relative;
@@ -686,8 +686,8 @@ ${t.recommendRegisteredMail}`,
       {/* Desktop Chat History Sidebar */}
       {!isMobile && (
         <div className="w-1/4 min-w-[250px]">
-          <Card className="h-full flex flex-col dark:bg-gray-800 dark:border-gray-700">
-              <CardHeader>
+          <Card className="h-full flex flex-col dark:bg-gray-800 dark:border-gray-700 rounded-none rounded-l-lg">
+              <CardHeader className="p-4">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm dark:text-gray-100">{t.history}</CardTitle>
                   {chatHistory.length > 0 && (
@@ -746,8 +746,8 @@ ${t.recommendRegisteredMail}`,
 
       {/* Main Chat Area */}
       <div className="flex-1 w-full">
-        <Card className="h-full flex flex-col dark:bg-gray-800 dark:border-gray-700">
-            <CardHeader className="flex-shrink-0">
+        <Card className={`h-full flex flex-col dark:bg-gray-800 dark:border-gray-700 ${!isMobile ? 'rounded-none rounded-r-lg' : 'rounded-lg m-4'}`}>
+            <CardHeader className="flex-shrink-0 p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <CardTitle className="dark:text-gray-100 text-sm md:text-base">
