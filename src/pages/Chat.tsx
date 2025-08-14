@@ -261,7 +261,6 @@ export const Chat: React.FC = () => {
     }
   };
 
-  // Document generation functions
   const getDocumentQuestions = (documentType: DocumentType): string[] => {
     switch (documentType) {
       case 'deposit-letter':
@@ -685,9 +684,9 @@ ${t.recommendRegisteredMail}`,
       `}</style>
       {/* Desktop Chat History Sidebar */}
       {!isMobile && (
-        <div className="w-1/4 min-w-[250px]">
+        <div className="w-1/4 min-w-[250px] h-full">
           <Card className="h-full flex flex-col dark:bg-gray-800 dark:border-gray-700 rounded-none rounded-l-lg">
-              <CardHeader className="p-4">
+              <CardHeader className="p-4 flex-shrink-0">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm dark:text-gray-100">{t.history}</CardTitle>
                   {chatHistory.length > 0 && (
@@ -709,9 +708,9 @@ ${t.recommendRegisteredMail}`,
                   {t.startChat}
                 </Button>
               </CardHeader>
-              <CardContent className="p-0 flex-1">
-                <ScrollArea className="h-[calc(100%-120px)]">
-                  <div className="p-4 space-y-2">
+              <CardContent className="p-0 flex-1 overflow-hidden">
+                <div className="h-full overflow-y-auto p-4">
+                  <div className="space-y-2">
                     {chatHistory.map((chat) => (
                       <div key={chat.id} className="relative group">
                         <Button
@@ -738,14 +737,14 @@ ${t.recommendRegisteredMail}`,
                       </div>
                     ))}
                   </div>
-                </ScrollArea>
+                </div>
               </CardContent>
             </Card>
           </div>
         )}
 
       {/* Main Chat Area */}
-      <div className="flex-1 w-full">
+      <div className="flex-1 w-full h-full">
         <Card className={`h-full flex flex-col dark:bg-gray-800 dark:border-gray-700 ${!isMobile ? 'rounded-none rounded-r-lg' : 'rounded-lg m-4'}`}>
             <CardHeader className="flex-shrink-0 p-4">
               <div className="flex items-center justify-between">
@@ -841,9 +840,9 @@ ${t.recommendRegisteredMail}`,
               )}
             </CardHeader>
             
-            <CardContent className="flex-1 flex flex-col p-0 min-h-0">
+            <CardContent className="flex-1 flex flex-col p-0 min-h-0 overflow-hidden">
               {/* Messages Area */}
-              <div className="flex-1 min-h-0 relative">
+              <div className="flex-1 min-h-0 relative overflow-hidden">
                 <div className="h-full overflow-y-auto p-4 chat-container">
                   {currentChat?.messages.length ? (
                     <div className="space-y-4">

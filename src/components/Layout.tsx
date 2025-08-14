@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -303,7 +302,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </header>
       
-      <main className={`pt-[72px] md:pt-[80px] lg:pt-[88px] dark:bg-gray-900 dark:text-white touch-manipulation flex flex-col ${location.pathname === '/chat' ? 'h-[calc(100vh-72px)] md:h-[calc(100vh-80px)] lg:h-[calc(100vh-88px)] overflow-hidden' : 'min-h-[calc(100vh-72px)] md:min-h-[calc(100vh-80px)] lg:min-h-[calc(100vh-88px)] overflow-auto'}`}>
+      <main className={`pt-[72px] md:pt-[80px] lg:pt-[88px] dark:bg-gray-900 dark:text-white touch-manipulation flex flex-col ${location.pathname === '/chat' ? 'h-screen overflow-hidden' : 'min-h-screen overflow-auto'}`}>
         {children}
       </main>
     </div>
